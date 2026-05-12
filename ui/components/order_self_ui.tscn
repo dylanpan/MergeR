@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[node name="OrderSelfUI" type="Control"]
+script = ExtResource("1_7tqwg")
+size = Vector2i(200, 250)
+
+[node name="nodeOrder" type="Control" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(200, 250)
+
+[node name="spRole" type="TextureRect" parent="nodeOrder"]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.6
+size = Vector2i(200, 150)
+
+[node name="lbHp" type="Label" parent="nodeOrder"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.62
+anchor_right = 0.5
+anchor_bottom = 0.72
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(90, 21)
+text = "HP: 0/0"
+
+[node name="nodeWeak" type="HBoxContainer" parent="nodeOrder"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.74
+anchor_right = 0.95
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(180, 23)
+
+[node name="nodeBullet" type="HBoxContainer" parent="nodeOrder"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.87
+anchor_right = 0.7
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(130, 33)
+
+[node name="btnFinish" type="Button" parent="nodeOrder"]
+anchors_preset = -1
+anchor_left = 0.72
+anchor_top = 0.87
+anchor_right = 0.95
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(46, 33)
+text = "OK"
+visible = false
+
+[ext_resource type="Script" path="res://ui/components/order_self_ui.gd" id="1_7tqwg"]

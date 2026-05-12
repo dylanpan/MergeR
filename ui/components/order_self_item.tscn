@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[node name="OrderSelfItem" type="Button"]
+size = Vector2i(530, 120)
+
+[node name="lblName" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.05
+anchor_right = 0.5
+anchor_bottom = 0.3
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(254, 30)
+text = "名称"
+
+[node name="lblDesc" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.35
+anchor_right = 0.7
+anchor_bottom = 0.55
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(360, 24)
+text = "描述"
+
+[node name="lblBuff" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.58
+anchor_right = 0.7
+anchor_bottom = 0.78
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(360, 24)
+text = "增益效果"
+
+[node name="lblHp" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.72
+anchor_top = 0.05
+anchor_right = 0.9
+anchor_bottom = 0.25
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(95, 24)
+text = "HP: 0"
+
+[node name="lblAtk" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.72
+anchor_top = 0.28
+anchor_right = 0.9
+anchor_bottom = 0.48
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(95, 24)
+text = "ATK: 0"
+
+[node name="lblDef" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.72
+anchor_top = 0.51
+anchor_right = 0.9
+anchor_bottom = 0.71
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(95, 24)
+text = "DEF: 0"
+
+[node name="lblStep" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.72
+anchor_top = 0.74
+anchor_right = 0.9
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(95, 24)
+text = "步数: 0"
+
+[node name="spSelect" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(490, 60)
+scale = Vector2(2, 2)

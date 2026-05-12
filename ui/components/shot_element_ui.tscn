@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[node name="ShotElementUI" type="Control"]
+script = ExtResource("1_xkm35")
+size = Vector2i(80, 80)
+
+[node name="spIcon" type="TextureRect" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(80, 80)
+visible = false
+
+[node name="btnItem" type="TextureButton" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(80, 80)
+
+[node name="spFinish" type="TextureRect" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(80, 80)
+visible = false
+
+[node name="spEmpty" type="TextureRect" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(80, 80)
+visible = false
+
+[ext_resource type="Script" path="res://ui/components/shot_element_ui.gd" id="1_xkm35"]

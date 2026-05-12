@@ -1,0 +1,22 @@
+; gdRoguelike - Godot 4.x 项目配置文件
+; 从 clearRoguelike (Cocos Creator + JavaScript) 迁移而来
+
+application/config/name="gdRoguelike"
+application/config/description="Roguelike game module migrated from ClearRoguelike"
+application/config/icon="res://icon.png"
+
+; 自动加载的 Autoload 单例
+autoload/GlobalEventBus="*res://autoload/global_event_bus.gd"
+autoload/ClearRoguelikeManager="*res://autoload/clear_roguelike_manager.gd"
+autoload/WorldDataManager="*res://autoload/world_data_manager.gd"
+autoload/UIManager="*res://autoload/ui_manager.gd"
+
+; 主场景
+application/run/main_scene="res://main.tscn"
+
+; 窗口设置
+display/window/size/viewport_width=1920
+display/window/size/viewport_height=1080
+display/window/size/mode=0
+display/window/stretch/mode="canvas_items"
+display/window/stretch/aspect="expand"

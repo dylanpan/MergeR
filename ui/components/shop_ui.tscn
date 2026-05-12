@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[node name="ShopUI" type="Control"]
+script = ExtResource("1_s8w5r")
+size = Vector2i(600, 400)
+visible = false
+
+[node name="lblGold" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.02
+anchor_right = 0.5
+anchor_bottom = 0.1
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(270, 32)
+text = "金币: 0"
+
+[node name="itemSlots" type="VBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.15
+anchor_right = 0.95
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(540, 280)
+
+[node name="nodeBtnClose" type="Button" parent="."]
+anchors_preset = -1
+anchor_left = 0.85
+anchor_top = 0.9
+anchor_right = 0.95
+anchor_bottom = 0.98
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(60, 32)
+text = "关闭"
+
+[ext_resource type="Script" path="res://ui/components/shop_ui.gd" id="1_s8w5r"]

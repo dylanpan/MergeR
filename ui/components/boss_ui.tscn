@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[node name="BossUI" type="Control"]
+script = ExtResource("1_ukcmv")
+size = Vector2i(400, 300)
+
+[node name="healthBar" type="TextureProgressBar" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.02
+anchor_right = 0.95
+anchor_bottom = 0.1
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(360, 24)
+visible = false
+
+[node name="phaseDisplay" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.12
+anchor_right = 0.5
+anchor_bottom = 0.22
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(180, 30)
+text = "第一阶段"
+visible = false
+
+[node name="shieldDisplay" type="TextureRect" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.25
+anchor_right = 0.3
+anchor_bottom = 0.4
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(100, 60)
+visible = false
+
+[node name="elementDisplay" type="HBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.45
+anchor_right = 0.95
+anchor_bottom = 0.6
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(360, 40)
+visible = false
+
+[node name="skillDisplay" type="HBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.65
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(360, 90)
+visible = false
+
+[ext_resource type="Script" path="res://ui/components/boss_ui.gd" id="1_ukcmv"]

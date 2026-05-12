@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[node name="MapPreviewScreen" type="Control"]
+script = ExtResource("1_2bxwr")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(1920, 1080)
+
+[node name="nodeDialog" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.15
+anchor_top = 0.1
+anchor_right = 0.85
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(1344, 864)
+
+[node name="nodeBg" type="Panel" parent="nodeDialog"]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="btnBack" type="Button" parent="nodeDialog/nodeBg"]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.92
+anchor_right = 0.1
+anchor_bottom = 0.98
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(108, 52)
+text = "返回"
+
+[node name="nodeTotalInfo" type="HBoxContainer" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.02
+anchor_right = 0.98
+anchor_bottom = 0.1
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(1290, 69)
+
+[node name="lblDifficulty" type="Label" parent="nodeDialog/nodeTotalInfo"]
+size = Vector2i(430, 69)
+text = "难度 5"
+
+[node name="lblSeed" type="Label" parent="nodeDialog/nodeTotalInfo"]
+size = Vector2i(430, 69)
+text = "种子: 0"
+
+[node name="lblTotalNodes" type="Label" parent="nodeDialog/nodeTotalInfo"]
+size = Vector2i(430, 69)
+text = "共 0 个关卡"
+
+[node name="nodeMapContainer" type="Control" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.12
+anchor_right = 0.98
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(1290, 657)
+
+[ext_resource type="Script" path="res://ui/screens/map_preview_screen.gd" id="1_2bxwr"]

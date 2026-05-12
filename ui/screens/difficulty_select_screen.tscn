@@ -1,0 +1,120 @@
+[gd_scene format=3]
+
+[node name="DifficultySelectScreen" type="Control"]
+script = ExtResource("1_1mo5p")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(1920, 1080)
+
+[node name="nodeDialog" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.3
+anchor_top = 0.2
+anchor_right = 0.7
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(768, 648)
+
+[node name="lblDifficultyLevel" type="Label" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.15
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(691, 65)
+text = "难度 5"
+
+[node name="lblDifficultyName" type="Label" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.15
+anchor_right = 0.95
+anchor_bottom = 0.25
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(691, 65)
+text = "困难"
+
+[node name="sliderDifficulty" type="HSlider" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.3
+anchor_right = 0.95
+anchor_bottom = 0.38
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(691, 52)
+min_value = 1.0
+max_value = 10.0
+value = 5.0
+
+[node name="lblInfo" type="Label" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.42
+anchor_right = 0.95
+anchor_bottom = 0.52
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(691, 65)
+text = "预计 20 回合 | 约 30 分钟"
+
+[node name="inputSeed" type="LineEdit" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.55
+anchor_right = 0.9
+anchor_bottom = 0.63
+grow_horizontal = 2
+grow_vertical = 0
+size = Vector2i(614, 52)
+placeholder_text = "输入种子值"
+
+[node name="btnRandomSeed" type="Button" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.66
+anchor_right = 0.65
+anchor_bottom = 0.74
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(230, 52)
+text = "随机种子"
+
+[node name="nodeBg" type="Panel" parent="nodeDialog"]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="btnBack" type="Button" parent="nodeDialog/nodeBg"]
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.82
+anchor_right = 0.3
+anchor_bottom = 0.95
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(192, 84)
+text = "返回"
+
+[node name="btnGo" type="Button" parent="nodeDialog/nodeBg"]
+anchors_preset = -1
+anchor_left = 0.7
+anchor_top = 0.82
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(192, 84)
+text = "确认开始"
+
+[ext_resource type="Script" path="res://ui/screens/difficulty_select_screen.gd" id="1_1mo5p"]

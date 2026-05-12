@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[node name="RoguelikeScreen" type="Control"]
+script = ExtResource("1_kd2ns")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size = Vector2i(1920, 1080)
+
+[node name="nodeDialog" type="Panel" parent="."]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size = Vector2i(1920, 1080)
+
+[node name="btnBack" type="Button" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.92
+anchor_right = 0.1
+anchor_bottom = 0.98
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(154, 65)
+text = "返回"
+
+[node name="btnMap" type="Button" parent="nodeDialog"]
+anchors_preset = -1
+anchor_left = 0.12
+anchor_top = 0.92
+anchor_right = 0.2
+anchor_bottom = 0.98
+grow_horizontal = 0
+grow_vertical = 0
+size = Vector2i(154, 65)
+text = "地图"
+
+[ext_resource type="Script" path="res://ui/screens/roguelike_screen.gd" id="1_kd2ns"]
