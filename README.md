@@ -1,12 +1,22 @@
 # gdRoguelike
 
-基于 **Godot 4.x** 引擎开发的 Roguelike 游戏模块，从 Cocos Creator + JavaScript 项目 [**clearRoguelike**](../clearRoguelike) 迁移而来。
+基于 **Godot 4.x** 引擎开发的 Roguelike 回合制探险游戏模块。
 
 ---
 
-## 项目背景
+## 游戏背景
 
-最初的原型项目 `clearRoguelike` 基于 **Cocos Creator** 引擎并使用 **JavaScript** 编写，采用 ECS（Entity-Component-System）架构实现了完整的 Roguelike 玩法循环。为利用 Godot 引擎强大的 2D/3D 渲染能力、场景系统以及更灵活的脚本支持，该项目被迁移至 Godot 4.x 平台，使用 **GDScript** 语言重写，同时保留了原项目的核心架构设计理念。
+在这片被混乱与未知笼罩的地下世界中，你将率领一支英雄队伍，一层层深入不断变化的地牢迷宫。每一次进入地牢，地形、敌人、宝物都将重新生成——没有两次冒险是完全相同的。
+
+在旅途中，你将遭遇：
+- **随机事件**：宝箱、祝福泉、神秘 Buff 等事件等待你的抉择
+- **回合制战斗**：策略性地排兵布阵，击败沿途的敌人
+- **商店与休息点**：在回合间补充资源、强化队伍
+- **Buff 与技能**：通过收集各类 Buff 和技能，打造独特的战斗流派
+
+你能走多远，取决于你的决策与运气。
+
+---
 
 ## 技术栈
 
@@ -25,16 +35,15 @@
 
 `core/world.gd` 是整个游戏的核心枢纽。它在游戏启动时创建并注册所有系统（System），并作为游戏主循环的入口。
 
-```gdscript
-# 系统注册流程（world.gd 中 _create_systems）
-- BuffSystem            # Buff/效果系统
-- CountDownStepSystem   # 倒计时步进系统
-- BattleSystem          # 战斗系统
-- RoundSystem           # 回合系统
-- ShopSystem            # 商店系统
-- EventSystem           # 事件系统
-- RestSystem            # 休息点系统
-```
+| 系统                    | 说明               |
+| ----------------------- | ------------------ |
+| `BuffSystem`            | Buff/效果系统      |
+| `CountDownStepSystem`   | 倒计时步进系统     |
+| `BattleSystem`          | 战斗系统           |
+| `RoundSystem`           | 回合系统           |
+| `ShopSystem`            | 商店系统           |
+| `EventSystem`           | 事件系统           |
+| `RestSystem`            | 休息点系统         |
 
 ### Autoload 管理器（单例）
 
@@ -63,30 +72,30 @@
 
 ### ECS 组件体系（core/）
 
-| 模块路径               | 说明                             |
-| ---------------------- | -------------------------------- |
-| `core/entity/`         | 实体基类及各类游戏实体定义       |
-| `core/component/`      | 组件，承载具体数据（坐标、技能、Buff 等） |
-| `core/system/`         | 系统，处理游戏逻辑（战斗、回合、事件） |
-| `core/buffs/`          | Buff 效果系统，含注册与类型索引    |
-| `core/skills/`         | 技能系统，含技能注册与类型索引     |
+| 模块路径           | 说明                                 |
+| ------------------ | ------------------------------------ |
+| `core/entity/`     | 实体基类及各类游戏实体定义（敌人、玩家、弹射物等） |
+| `core/component/`  | 组件，承载具体数据（坐标、技能、Buff、护盾等） |
+| `core/system/`     | 系统，处理游戏逻辑（战斗、回合、事件）       |
+| `core/buffs/`      | Buff 效果系统，含注册与类型索引          |
+| `core/skills/`     | 技能系统，含技能注册与类型索引           |
 
 ### 随机事件（events/）
 
-| 文件                     | 说明               |
-| ------------------------ | ------------------ |
-| `event_factory.gd`       | 事件工厂，控制随机生成逻辑 |
-| `treasure_chest_event.gd` | 宝箱事件           |
-| `heal_fountain_event.gd`  | 祝福泉（回复）事件 |
-| `random_buff_event.gd`   | 随机 Buff 事件      |
+| 文件                     | 说明                |
+| ------------------------ | ------------------- |
+| `event_factory.gd`       | 事件工厂，随机生成逻辑  |
+| `treasure_chest_event.gd` | 宝箱事件            |
+| `heal_fountain_event.gd`  | 祝福泉（回复）事件    |
+| `random_buff_event.gd`   | 随机 Buff 事件       |
 
 ### 地图系统（map/）
 
-核心地图系统，负责关卡布局生成与节点管理。
+负责关卡地图的布局生成与节点管理，支撑地牢的随机化探索体验。
 
 ### 休息点（rests/）
 
-回合间可停留的功能休息点，提供恢复和策略选择。
+回合间可停留的功能休息点，提供队伍恢复和策略选择。
 
 ### UI 框架（ui/）
 
@@ -131,7 +140,3 @@ gdRoguelike/
    - 难度选择界面（默认难度 5）
    - 角色选择界面
    - 进入 Roguelike 主游戏
-
-## 相关项目
-
-- [clearRoguelike](../clearRoguelike) — 本项目的 Cocos Creator + JavaScript 原型版本
