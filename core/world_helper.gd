@@ -40,7 +40,7 @@ static func is_alive(entity) -> bool:
 	if not entity:
 		return false
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			return data_comp.data.get("hp", 0) > 0
 	return false
@@ -50,7 +50,7 @@ static func is_enemy(entity) -> bool:
 	if not entity:
 		return false
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			return data_comp.data.get("type", 0) == 2
 	return false
@@ -60,7 +60,7 @@ static func get_hp(entity) -> int:
 	if not entity:
 		return 0
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			return data_comp.data.get("hp", 0)
 	return 0
@@ -70,7 +70,7 @@ static func get_hp_percent(entity) -> float:
 	if not entity:
 		return 0.0
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			var data = data_comp.data
 			var hp = data.get("hp", 0)
@@ -90,7 +90,7 @@ static func get_def(entity) -> int:
 	if not entity:
 		return 0
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			return data_comp.data.get("def", 0)
 	return 0
@@ -100,7 +100,7 @@ static func get_atk(entity) -> int:
 	if not entity:
 		return 0
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			return data_comp.data.get("atk", 0)
 	return 0

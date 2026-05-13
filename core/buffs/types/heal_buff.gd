@@ -25,7 +25,7 @@ func _heal_target(target) -> void:
 	if not target:
 		return
 	if target.has_method("get_component"):
-		var data_comp = target.get_component("Data") as DataComponent
+		var data_comp = target.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			var heal_amount = get_buff_value()
 			var max_hp = data_comp.data.get("maxHp", data_comp.data.get("hp", 0) + heal_amount)

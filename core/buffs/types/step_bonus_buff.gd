@@ -11,7 +11,7 @@ func _init(buff_data: Dictionary = {}):
 func apply(context: BuffContext):
 	super.apply(context)
 	if context.entity and context.entity.has_method("get_component"):
-		var data_comp = context.entity.get_component("Data") as DataComponent
+		var data_comp = context.entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			var step = data_comp.data.get("step", 0)
 			data_comp.data["step"] = step + get_buff_value()

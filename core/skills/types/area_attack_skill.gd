@@ -22,7 +22,7 @@ func on_execute(context: Dictionary) -> void:
 	
 	# 遍历对每个目标执行伤害
 	for target in enemies:
-		var data_comp = target.get_component("Data") as DataComponent
+		var data_comp = target.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			data_comp.data["hp"] = data_comp.data.get("hp", 0) - damage
 	

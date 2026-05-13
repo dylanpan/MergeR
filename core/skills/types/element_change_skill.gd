@@ -18,7 +18,7 @@ func on_execute(context: Dictionary) -> void:
 	if not target:
 		return
 	
-	var elem_change = target.get_component("ElementChange") as ElementChangeComponent
+	var elem_change = target.get_component(ComponentNames.ELEMENT_CHANGE) as ElementChangeComponent
 	if elem_change:
 		elem_change.change_to(element_type, duration)
 	

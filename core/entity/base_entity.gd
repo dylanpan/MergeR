@@ -44,10 +44,10 @@ func dispose() -> void:
 	_component_map.clear()
 
 func sync_to_data() -> void:
-	var data_comp = get_component("Data") as DataComponent
+	var data_comp = get_component(ComponentNames.DATA) as DataComponent
 	if not data_comp or data_comp.data.is_empty():
 		return
-	var buff_comp = get_component("Buff") as BuffComponent
+	var buff_comp = get_component(ComponentNames.BUFF) as BuffComponent
 	if buff_comp:
 		data_comp.data["buffs"] = buff_comp.to_json()
 

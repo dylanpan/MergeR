@@ -17,7 +17,7 @@ func update(dt: float) -> void:
 func _update_order_enermy_entities() -> void:
 	var order_enermy = WorldDataManager.get_order_enermy_entities()
 	for entity in order_enermy:
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if not data_comp:
 			continue
 		var data = data_comp.data

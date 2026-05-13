@@ -18,7 +18,7 @@ func on_execute(context: Dictionary) -> void:
 	if not target:
 		return
 	
-	var shield_comp = target.get_component("Shield") as ShieldComponent
+	var shield_comp = target.get_component(ComponentNames.SHIELD) as ShieldComponent
 	if shield_comp:
 		shield_comp.add_shield(value, duration)
 	

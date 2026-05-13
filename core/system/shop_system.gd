@@ -17,7 +17,7 @@ func update(dt: float) -> void:
 func open_shop(entity) -> void:
 	if not entity:
 		return
-	var shop_comp = entity.get_component("Shop") as ShopComponent
+	var shop_comp = entity.get_component(ComponentNames.SHOP) as ShopComponent
 	if not shop_comp:
 		return
 	var shop_data = {
@@ -28,7 +28,7 @@ func open_shop(entity) -> void:
 	GlobalEventBus.event_shop_open.emit(shop_comp.shop_id, shop_data)
 
 func buy_item(entity, item_index: int) -> bool:
-	var shop_comp = entity.get_component("Shop") as ShopComponent
+	var shop_comp = entity.get_component(ComponentNames.SHOP) as ShopComponent
 	if not shop_comp:
 		return false
 	if item_index < 0 or item_index >= shop_comp.items.size():
@@ -41,7 +41,7 @@ func buy_item(entity, item_index: int) -> bool:
 func refresh_shop(entity) -> void:
 	if not entity:
 		return
-	var shop_comp = entity.get_component("Shop") as ShopComponent
+	var shop_comp = entity.get_component(ComponentNames.SHOP) as ShopComponent
 	if not shop_comp:
 		return
 	shop_comp.refresh([])

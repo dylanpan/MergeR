@@ -23,14 +23,14 @@ func _init(i: int = 0, j: int = 0, root = null, area_id: int = 0):
 	add_component(ui_comp)
 
 func init(data: Dictionary) -> void:
-	var data_comp = get_component("Data") as DataComponent
+	var data_comp = get_component(ComponentNames.DATA) as DataComponent
 	if data_comp and not data.is_empty():
 		data_comp.init(data)
 		var buff_id = data.get("buffId", 0)
 		if buff_id:
 			var buff_config = MetaConsts.buffs.get(buff_id, {})
 			if not buff_config.is_empty():
-				var buff_comp = get_component("Buff") as BuffComponent
+				var buff_comp = get_component(ComponentNames.BUFF) as BuffComponent
 				if buff_comp:
 					buff_comp.add_buff({
 						"type": buff_config.get("type", ""),

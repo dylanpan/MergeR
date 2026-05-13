@@ -46,7 +46,7 @@ func _update_after_battle() -> int:
 	var self_entities = WorldDataManager.get_order_self_entities()
 	var self_finished = []
 	for entity in self_entities:
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if not data_comp:
 			continue
 		var data = data_comp.data
@@ -67,7 +67,7 @@ func _update_after_battle() -> int:
 	var enermy_entities = WorldDataManager.get_order_enermy_entities()
 	var enermy_finished = []
 	for entity in enermy_entities:
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if not data_comp:
 			continue
 		var data = data_comp.data
@@ -129,7 +129,7 @@ func _add_launcher_entities(game_data) -> void:
 			var key = str(i) + "_" + str(j)
 			var launcher_data = game_data.launchers.get(key, {}) if game_data else {}
 			if not launcher_data.is_empty():
-				var data_comp = entity.get_component("Data") as DataComponent
+				var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 				if data_comp:
 					data_comp.init(launcher_data)
 			wdm.add_launcher_entity(entity)
@@ -139,7 +139,7 @@ func _add_bullet_entities(game_data) -> void:
 	var wdm = WorldDataManager
 	var launchers = wdm.get_launcher_entities()
 	for launcher in launchers:
-		var data_comp = launcher.get_component("Data") as DataComponent
+		var data_comp = launcher.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and not data_comp.data.is_empty():
 			var elem_data = wdm.create_element_data(data_comp.data.get("id", 0))
 			var bullet_entity = BaseEntity.new()

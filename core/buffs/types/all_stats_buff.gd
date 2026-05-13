@@ -11,7 +11,7 @@ func _init(buff_data: Dictionary = {}):
 func apply(context: BuffContext):
 	super.apply(context)
 	if context.entity and context.entity.has_method("get_component"):
-		var data_comp = context.entity.get_component("Data") as DataComponent
+		var data_comp = context.entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			var multiplier = get_buff_value()
 			data_comp.data["atk"] = floor(data_comp.data.get("atk", 0) * multiplier)
@@ -21,7 +21,7 @@ func apply(context: BuffContext):
 
 func remove(context: BuffContext):
 	if context.entity and context.entity.has_method("get_component"):
-		var data_comp = context.entity.get_component("Data") as DataComponent
+		var data_comp = context.entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			var multiplier = 1.0 / get_buff_value()
 			data_comp.data["atk"] = floor(data_comp.data.get("atk", 0) * multiplier)

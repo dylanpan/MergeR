@@ -18,7 +18,7 @@ func on_execute(context: Dictionary) -> void:
 	if not target:
 		return
 	
-	var data_comp = target.get_component("Data") as DataComponent
+	var data_comp = target.get_component(ComponentNames.DATA) as DataComponent
 	if not data_comp:
 		return
 	

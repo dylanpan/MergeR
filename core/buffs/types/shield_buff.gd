@@ -14,7 +14,7 @@ func apply(context: BuffContext):
 	super.apply(context)
 	# 如果通过 apply 触发，同时通过 ShieldComponent 添加护盾
 	if context.entity and context.entity.has_method("get_component"):
-		var shield_comp = context.entity.get_component("Shield") as ShieldComponent
+		var shield_comp = context.entity.get_component(ComponentNames.SHIELD) as ShieldComponent
 		if shield_comp:
 			shield_comp.add_shield(value)
 

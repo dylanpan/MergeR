@@ -12,7 +12,7 @@ func on_hurt(context: BuffContext):
 	if not context.entity:
 		return
 	if context.entity.has_method("get_component"):
-		var data_comp = context.entity.get_component("Data") as DataComponent
+		var data_comp = context.entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			var hp = data_comp.data.get("hp", 0)
 			var max_hp = data_comp.data.get("maxHp", hp)

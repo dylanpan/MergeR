@@ -38,7 +38,7 @@ func _do_stage(stage: int) -> void:
 
 func _do_battle(atk_entities: Array, def_entities: Array, is_left: bool = true) -> void:
 	for atk_entity in atk_entities:
-		var atk_data_comp = atk_entity.get_component("Data") as DataComponent
+		var atk_data_comp = atk_entity.get_component(ComponentNames.DATA) as DataComponent
 		if not atk_data_comp or not atk_data_comp.data.get("isAtker", false):
 			continue
 		var atk_data = atk_data_comp.data
@@ -69,7 +69,7 @@ func _do_battle(atk_entities: Array, def_entities: Array, is_left: bool = true) 
 				
 				if hit:
 					var def_entity = def_entities[k]
-					var def_data_comp = def_entity.get_component("Data") as DataComponent
+					var def_data_comp = def_entity.get_component(ComponentNames.DATA) as DataComponent
 					if not def_data_comp:
 						continue
 					var def_data = def_data_comp.data
@@ -98,7 +98,7 @@ func _do_battle(atk_entities: Array, def_entities: Array, is_left: bool = true) 
 			_do_reset_step(atk_entity)
 
 func _do_hit(entity, atk: float, is_weakness: bool, is_resistance: bool) -> void:
-	var data_comp = entity.get_component("Data") as DataComponent
+	var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 	if not data_comp:
 		return
 	var data = data_comp.data
@@ -110,7 +110,7 @@ func _do_hit(entity, atk: float, is_weakness: bool, is_resistance: bool) -> void
 		WorldDataManager.process_order_defeated(entity)
 
 func _do_reset_step(entity) -> void:
-	var data_comp = entity.get_component("Data") as DataComponent
+	var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 	if not data_comp:
 		return
 	var data = data_comp.data
@@ -119,7 +119,7 @@ func _do_reset_step(entity) -> void:
 		data["step"] = order_meta.get("step", 0)
 
 func _do_change_pre_atker(entity) -> void:
-	var data_comp = entity.get_component("Data") as DataComponent
+	var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 	if not data_comp:
 		return
 	var data = data_comp.data
@@ -129,7 +129,7 @@ func _do_change_pre_atker(entity) -> void:
 
 func _reset_battle_flag(entities: Array) -> void:
 	for entity in entities:
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if not data_comp:
 			continue
 		var data = data_comp.data
@@ -146,9 +146,9 @@ func _check_resistance_match(atk_elem: int, def_elem: int) -> bool:
 func _update_boss_abilities(dt: float) -> void:
 	var enermy_entities = WorldDataManager.get_order_enermy_entities()
 	for boss_entity in enermy_entities:
-		var pm = boss_entity.get_component("PhaseManager") as PhaseManagerComponent
+		var pm = boss_entity.get_component(ComponentNames.PHASE_MANAGER) as PhaseManagerComponent
 		if pm:
-			var data_comp = boss_entity.get_component("Data") as DataComponent
+			var data_comp = boss_entity.get_component(ComponentNames.DATA) as DataComponent
 			if data_comp:
 				var hp = data_comp.data.get("hp", 0)
 				var max_hp = data_comp.data.get("maxHp", hp)
