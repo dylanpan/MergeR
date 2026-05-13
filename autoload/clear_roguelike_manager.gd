@@ -60,10 +60,33 @@ func create_world(node = null) -> void:
 	world.create(node)
 	_world = world
 
+func get_world():
+	return _world
+
 func get_systems() -> Array:
 	if not _world:
 		return []
 	return _world.get_systems()
+
+func get_game_state_manager():
+	if not _world:
+		return null
+	return _world.game_state_manager
+
+func get_inventory_manager():
+	if not _world:
+		return null
+	return _world.inventory_manager
+
+func get_entity_service():
+	if not _world:
+		return null
+	return _world.entity_service
+
+func get_ui_root_manager():
+	if not _world:
+		return null
+	return _world.ui_root_manager
 
 func get_save_game_data() -> Dictionary:
 	var wdm = WorldDataManager

@@ -2,14 +2,24 @@ extends Node
 
 # ============================================================
 # World 核心类（替代 World.js）
-# 管理所有系统，作为游戏主循环入口
+# 管理所有系统和子管理器，作为游戏主循环入口
 # ============================================================
 
 var _systems: Array = []
+
+# 子管理器（新架构）
 var entity_manager: EntityManager = null
+var entity_service: EntityService = null
+var game_state_manager: GameStateManager = null
+var inventory_manager: InventoryManager = null
+var ui_root_manager: UIRootManager = null
 
 func _init():
 	entity_manager = EntityManager.new()
+	entity_service = EntityService.new(entity_manager)
+	game_state_manager = GameStateManager.new()
+	inventory_manager = InventoryManager.new()
+	ui_root_manager = UIRootManager.new()
 
 func create(node = null) -> void:
 	_create_systems()
@@ -18,18 +28,7 @@ func create(node = null) -> void:
 	BuffSystem.get_instance().init()
 	
 	if node:
-		var wdm = WorldDataManager
-		# node is expected to have UI root references
-		if node.has_method("get_element_ui_root"):
-			wdm.add_element_ui_root(node.get_element_ui_root())
-		if node.has_method("get_launcher_ui_root"):
-			wdm.add_launcher_ui_root(node.get_launcher_ui_root())
-		if node.has_method("get_bullet_ui_root"):
-			wdm.add_bullet_ui_root(node.get_bullet_ui_root())
-		if node.has_method("get_order_ui_root"):
-			wdm.add_order_ui_root(node.get_order_ui_root())
-		if node.has_method("get_attack_ui_root"):
-			wdm.add_attack_ui_root(node.get_attack_ui_root())
+		ui_root_manager.setup_from_node(node)
 
 func _create_systems() -> void:
 	var buff_system = BuffSystem.get_instance()
@@ -56,11 +55,18 @@ func _create_systems() -> void:
 func get_systems() -> Array:
 	return _systems
 
+# ==================== 便捷查询 API ====================
+
 func query() -> EntityQuery:
 	return entity_manager.query()
 
 func query_type(type_val: int) -> EntityQuery:
 	return entity_manager.query_type(type_val)
+
+func get_entity(entity_id: String):
+	return entity_manager.get_by_id(entity_id)
+
+# ==================== 生命周期 ====================
 
 func destroy() -> void:
 	for system in _systems:
@@ -68,4 +74,5 @@ func destroy() -> void:
 	_systems.clear()
 	
 	entity_manager.clear_all()
+	game_state_manager.reset()
 	WorldDataManager.set_init_flag(false)
