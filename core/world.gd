@@ -6,13 +6,15 @@ extends Node
 # ============================================================
 
 var _systems: Array = []
+var entity_manager: EntityManager = null
 
 func _init():
-	pass
+	entity_manager = EntityManager.new()
 
 func create(node = null) -> void:
 	_create_systems()
 	WorldDataManager.set_world(self)
+	WorldDataManager.set_entity_manager(entity_manager)
 	BuffSystem.get_instance().init()
 	
 	if node:
@@ -54,10 +56,16 @@ func _create_systems() -> void:
 func get_systems() -> Array:
 	return _systems
 
+func query() -> EntityQuery:
+	return entity_manager.query()
+
+func query_type(type_val: int) -> EntityQuery:
+	return entity_manager.query_type(type_val)
+
 func destroy() -> void:
 	for system in _systems:
 		system.dispose()
 	_systems.clear()
 	
-	WorldDataManager.remove_all_entities()
+	entity_manager.clear_all()
 	WorldDataManager.set_init_flag(false)

@@ -18,6 +18,9 @@ func add_component(c: BaseComponent) -> void:
 	if c:
 		_component_map[c.comp_name] = c
 
+func get_component_names() -> Array:
+	return _component_map.keys()
+
 func get_component(name: String) -> BaseComponent:
 	return _component_map.get(name, null)
 

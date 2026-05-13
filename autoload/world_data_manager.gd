@@ -6,6 +6,7 @@ extends Node
 # ============================================================
 
 var _world = null
+var _entity_manager = null
 var _game_data = null
 
 # UI 根节点引用
@@ -74,6 +75,12 @@ func set_world(world) -> void:
 func get_world():
 	return _world
 
+func set_entity_manager(em) -> void:
+	_entity_manager = em
+
+func get_entity_manager():
+	return _entity_manager
+
 func set_init_flag(value: bool) -> void:
 	_init_flag = value
 
@@ -115,6 +122,8 @@ func get_attack_ui_root():
 func add_order_entity(entity) -> void:
 	_order_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 	var data_comp = entity.get_component("Data")
 	if data_comp and data_comp.data:
 		var data = data_comp.data
@@ -131,6 +140,8 @@ func remove_order_self_entity(entity) -> void:
 	if idx != -1:
 		_order_entities.remove_at(idx)
 	_entity_map.erase(entity.get_id())
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
 
 func remove_order_enermy_entity(entity) -> void:
 	var idx = _order_enermy_entities.find(entity)
@@ -140,6 +151,8 @@ func remove_order_enermy_entity(entity) -> void:
 	if idx != -1:
 		_order_entities.remove_at(idx)
 	_entity_map.erase(entity.get_id())
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
 
 func get_order_entities() -> Array:
 	return _order_entities
@@ -147,14 +160,20 @@ func get_order_entities() -> Array:
 func add_element_entity(entity) -> void:
 	_element_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func add_launcher_entity(entity) -> void:
 	_launcher_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func add_bullet_entity(entity) -> void:
 	_bullet_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func get_bullet_entities() -> Array:
 	return _bullet_entities
@@ -162,6 +181,8 @@ func get_bullet_entities() -> Array:
 func add_shot_entity(entity) -> void:
 	_shot_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func get_shot_entities() -> Array:
 	return _shot_entities
@@ -281,12 +302,16 @@ func get_order_self_entities() -> Array:
 func add_shop_entity(entity) -> void:
 	_shop_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func remove_shop_entity(entity) -> void:
 	var idx = _shop_entities.find(entity)
 	if idx != -1:
 		_shop_entities.remove_at(idx)
 	_entity_map.erase(entity.get_id())
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
 
 func get_shop_entities() -> Array:
 	return _shop_entities
@@ -294,12 +319,16 @@ func get_shop_entities() -> Array:
 func add_event_entity(entity) -> void:
 	_event_entities.append(entity)
 	_entity_map[entity.get_id()] = entity
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
 
 func remove_event_entity(entity) -> void:
 	var idx = _event_entities.find(entity)
 	if idx != -1:
 		_event_entities.remove_at(idx)
 	_entity_map.erase(entity.get_id())
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
 
 func get_event_entities() -> Array:
 	return _event_entities
