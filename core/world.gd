@@ -5,7 +5,7 @@ extends Node
 # 管理所有系统和子管理器，作为游戏主循环入口
 # ============================================================
 
-var _systems: Array = []
+var system_registry: SystemRegistry = null
 
 # 子管理器（新架构）
 var entity_manager: EntityManager = null
@@ -15,6 +15,7 @@ var inventory_manager: InventoryManager = null
 var ui_root_manager: UIRootManager = null
 
 func _init():
+	system_registry = SystemRegistry.new()
 	entity_manager = EntityManager.new()
 	entity_service = EntityService.new(entity_manager)
 	game_state_manager = GameStateManager.new()
@@ -22,7 +23,8 @@ func _init():
 	ui_root_manager = UIRootManager.new()
 
 func create(node = null) -> void:
-	_create_systems()
+	# 使用 SystemRegistry 注册所有内置系统
+	system_registry.register_builtin()
 	WorldDataManager.set_world(self)
 	WorldDataManager.set_entity_manager(entity_manager)
 	BuffSystem.get_instance().init()
@@ -30,30 +32,8 @@ func create(node = null) -> void:
 	if node:
 		ui_root_manager.setup_from_node(node)
 
-func _create_systems() -> void:
-	var buff_system = BuffSystem.get_instance()
-	_systems.append(buff_system)
-	
-	var count_down_step_system = CountDownStepSystem.new()
-	_systems.append(count_down_step_system)
-	
-	var battle_system = BattleSystem.new()
-	_systems.append(battle_system)
-	
-	var round_system = RoundSystem.new()
-	_systems.append(round_system)
-	
-	var shop_system = ShopSystem.new()
-	_systems.append(shop_system)
-	
-	var event_system = EventSystem.new()
-	_systems.append(event_system)
-	
-	var rest_system = RestSystem.new()
-	_systems.append(rest_system)
-
 func get_systems() -> Array:
-	return _systems
+	return system_registry.get_all()
 
 # ==================== 便捷查询 API ====================
 
@@ -69,10 +49,7 @@ func get_entity(entity_id: String):
 # ==================== 生命周期 ====================
 
 func destroy() -> void:
-	for system in _systems:
-		system.dispose()
-	_systems.clear()
-	
+	system_registry.dispose_all()
 	entity_manager.clear_all()
 	game_state_manager.reset()
 	WorldDataManager.set_init_flag(false)
