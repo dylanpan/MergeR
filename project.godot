@@ -1,22 +1,42 @@
-; gdRoguelike - Godot 4.x 项目配置文件
-; 从 clearRoguelike (Cocos Creator + JavaScript) 迁移而来
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
-application/config/name="gdRoguelike"
-application/config/description="Roguelike game module migrated from ClearRoguelike"
-application/config/icon="res://icon.png"
+config_version=5
 
-; 自动加载的 Autoload 单例
-autoload/GlobalEventBus="*res://autoload/global_event_bus.gd"
-autoload/ClearRoguelikeManager="*res://autoload/clear_roguelike_manager.gd"
-autoload/WorldDataManager="*res://autoload/world_data_manager.gd"
-autoload/UIManager="*res://autoload/ui_manager.gd"
+[application]
 
-; 主场景
-application/run/main_scene="res://main.tscn"
+config/name="gdRoguelike"
+config/description="Roguelike game module migrated from ClearRoguelike"
+config/version="0.1.0"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.6", "Mobile")
+config/icon="res://icon.svg"
 
-; 窗口设置
-display/window/size/viewport_width=1920
-display/window/size/viewport_height=1080
-display/window/size/mode=0
-display/window/stretch/mode="canvas_items"
-display/window/stretch/aspect="expand"
+[autoload]
+
+GlobalEventBus="*res://autoload/global_event_bus.gd"
+ClearRoguelikeManager="*res://autoload/clear_roguelike_manager.gd"
+WorldDataManager="*res://autoload/world_data_manager.gd"
+UIManager="*res://autoload/ui_manager.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
