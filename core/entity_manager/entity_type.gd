@@ -13,3 +13,4 @@ const BULLET: int = 5
 const SHOT: int = 6
 const SHOP: int = 7
 const EVENT: int = 8
+const REST: int = 9

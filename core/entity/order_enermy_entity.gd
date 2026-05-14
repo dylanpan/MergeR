@@ -6,6 +6,9 @@ extends BaseEntity
 
 class_name OrderEnermyEntity
 
+func get_entity_type() -> int:
+	return EntityType.ORDER_ENEMY
+
 var step: int = 0
 
 func _init(data: Dictionary = {}):

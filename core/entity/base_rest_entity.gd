@@ -6,6 +6,9 @@ extends BaseEntity
 
 class_name BaseRestEntity
 
+func get_entity_type() -> int:
+	return EntityType.REST
+
 var rest_id: int = 0
 var rest_type: String = ""
 

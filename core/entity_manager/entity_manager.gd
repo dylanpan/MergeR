@@ -28,7 +28,7 @@ func register_entity(entity) -> void:
 	var entity_id = entity.get_id()
 	_entity_map[entity_id] = entity
 
-	# 使用 EntityType 枚举分类
+	# 使用实体自身的 get_entity_type() 方法分类
 	var type_val = _resolve_entity_type(entity)
 	if type_val != EntityType.UNKNOWN:
 		if not _entities_by_type.has(type_val):
@@ -102,30 +102,22 @@ func dispose_entity(entity) -> void:
 # ==================== 内部方法 ====================
 
 func _resolve_entity_type(entity) -> int:
-	if not entity.has_method("get_component"):
-		return EntityType.UNKNOWN
-	var data_comp = entity.get_component(ComponentNames.DATA)
-	if not data_comp or not data_comp.data:
-		return EntityType.UNKNOWN
-	var type_val = data_comp.data.get("type", 0)
-	if type_val == GameConsts.OrderType_Self:
-		return EntityType.ORDER_SELF
-	elif type_val == GameConsts.OrderType_Enermy:
-		return EntityType.ORDER_ENEMY
-	# 通过类名或类型判断
-	var entity_class = entity.get_class()
-	if entity_class == "ElementEntity":
-		return EntityType.ELEMENT
-	elif entity_class == "LauncherEntity":
-		return EntityType.LAUNCHER
-	elif entity_class == "BulletEntity" or entity_class.find("Bullet") != -1:
-		return EntityType.BULLET
-	elif entity_class == "ShotElementEntity":
-		return EntityType.SHOT
-	elif entity_class == "ShopEntity":
-		return EntityType.SHOP
-	elif entity_class == "BaseEventEntity" or entity_class.find("Event") != -1:
-		return EntityType.EVENT
+	# 优先使用实体自身的 get_entity_type() 方法（最安全，不依赖字符串匹配）
+	if entity.has_method("get_entity_type"):
+		var type_val = entity.get_entity_type()
+		if type_val != EntityType.UNKNOWN:
+			return type_val
+	
+	# 降级：通过 DataComponent 中的 type 字段判断（用于 Order 类型）
+	if entity.has_method("get_component"):
+		var data_comp = entity.get_component(ComponentNames.DATA)
+		if data_comp and data_comp.data:
+			var type_val = data_comp.data.get("type", 0)
+			if type_val == GameConsts.OrderType_Self:
+				return EntityType.ORDER_SELF
+			elif type_val == GameConsts.OrderType_Enermy:
+				return EntityType.ORDER_ENEMY
+	
 	return EntityType.UNKNOWN
 
 func _reset() -> void:
@@ -141,3 +133,4 @@ func _reset() -> void:
 	_entities_by_type[EntityType.SHOT] = []
 	_entities_by_type[EntityType.SHOP] = []
 	_entities_by_type[EntityType.EVENT] = []
+	_entities_by_type[EntityType.REST] = []

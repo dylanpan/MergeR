@@ -38,6 +38,10 @@ func has_component(name: String) -> bool:
 func get_id() -> String:
 	return entity_id
 
+# 实体类型标识（子类重写）
+func get_entity_type() -> int:
+	return 0  # UNKNOWN
+
 func dispose() -> void:
 	for c in _component_map.values():
 		c.dispose()

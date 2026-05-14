@@ -6,6 +6,9 @@ extends BaseEntity
 
 class_name ElementEntity
 
+func get_entity_type() -> int:
+	return EntityType.ELEMENT
+
 func _init(i: int = 0, j: int = 0, root = null, area_id: int = 0):
 	var coord = CoordComponent.new(i, j, area_id)
 	add_component(coord)

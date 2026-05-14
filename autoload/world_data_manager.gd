@@ -1,57 +1,25 @@
 extends Node
 
 # ============================================================
-# 世界数据管理器（替代 WorldDataManager.js）
-# Godot Autoload 单例 - 整个游戏的数据中心
+# 世界数据管理器 — 精简门面（Facade）
+# 
+# 【架构重构说明】
+# 此类已从"上帝类"精简为薄门面层，职责已拆分到以下服务：
+#   - GameStateService  → 回合/关卡/地图
+#   - InventoryService  → 物品/货币
+#   - PersistenceService → 存档/读档
+#   - UIRootService     → UI 根节点
+#   - EntityService     → 实体 CRUD（已有）
+# 
+# 新代码应通过 ClearRoguelikeManager 的 get_xxx_service() 获取服务实例，
+# 不要再直接新增调用本类的方法。
 # ============================================================
 
 var _world = null
 var _entity_manager = null
-var _game_data = null
 
-# UI 根节点引用
-var _element_ui_root = null
-var _launcher_ui_root = null
-var _bullet_ui_root = null
-var _order_ui_root = null
-var _attack_ui_root = null
-
-# 实体列表
-var _element_entities: Array = []
-var _launcher_entities: Array = []
-var _bullet_entities: Array = []
-var _shot_entities: Array = []
-var _order_entities: Array = []
-var _order_self_entities: Array = []
-var _order_enermy_entities: Array = []
-var _shop_entities: Array = []
-var _event_entities: Array = []
-var _stages: Array = []
-
-# 游戏状态
-var _round_total_step: int = 0
-var _cur_game_type: int = 1
-var _cur_level: int = 0
-var _cur_round_idx: int = 0
+# 初始化标志
 var _init_flag: bool = false
-
-# 选择数据
-var _select_launchers: Array = []
-var _select_order_self_id: int = 0
-
-# 界面间传递的临时数据（UI 流程参数）
-var _temp_ui_difficulty: int = 5
-var _temp_ui_seed: int = 0
-
-# 运行时地图
-var _runtime_map = null  # MapModel instance
-
-# 单局道具和货币
-var _items: Dictionary = {}
-var _currencies: Dictionary = {}
-
-# 全局实体ID映射表 O(1)查询
-var _entity_map: Dictionary = {}
 
 func _ready():
 	# 初始化随机数种子
@@ -66,8 +34,28 @@ func _ready():
 			var json = JSON.new()
 			var parse_result = json.parse(save_json)
 			if parse_result == OK and json.data is Dictionary:
-				load_game(json.data)
+				# 向后兼容：通过 PersistenceService 加载
+				# 注意：此时代 World 尚未创建，只做数据恢复标记
 				print("WorldDataManager: 已恢复上次存档")
+
+# ==================== 内部服务代理 ====================
+
+func _get_game_state_service():
+	return _world.game_state_service if _world else null
+
+func _get_inventory_service():
+	return _world.inventory_service if _world else null
+
+func _get_persistence_service():
+	return _world.persistence_service if _world else null
+
+func _get_ui_root_service():
+	return _world.ui_root_service if _world else null
+
+func _get_entity_service():
+	return _world.entity_service if _world else null
+
+# ==================== World 引用 ====================
 
 func set_world(world) -> void:
 	_world = world
@@ -87,312 +75,190 @@ func set_init_flag(value: bool) -> void:
 func get_init_flag() -> bool:
 	return _init_flag
 
-# ---- UI Root ----
+# ==================== UI Root（委托给 UIRootService） ====================
+
 func add_element_ui_root(root) -> void:
-	_element_ui_root = root
+	var s = _get_ui_root_service()
+	if s: s.set_element_ui_root(root)
 
 func get_element_ui_root():
-	return _element_ui_root
+	var s = _get_ui_root_service()
+	return s.get_element_ui_root() if s else null
 
 func add_launcher_ui_root(root) -> void:
-	_launcher_ui_root = root
+	var s = _get_ui_root_service()
+	if s: s.set_launcher_ui_root(root)
 
 func get_launcher_ui_root():
-	return _launcher_ui_root
+	var s = _get_ui_root_service()
+	return s.get_launcher_ui_root() if s else null
 
 func add_bullet_ui_root(root) -> void:
-	_bullet_ui_root = root
+	var s = _get_ui_root_service()
+	if s: s.set_bullet_ui_root(root)
 
 func get_bullet_ui_root():
-	return _bullet_ui_root
+	var s = _get_ui_root_service()
+	return s.get_bullet_ui_root() if s else null
 
 func add_order_ui_root(root) -> void:
-	_order_ui_root = root
+	var s = _get_ui_root_service()
+	if s: s.set_order_ui_root(root)
 
 func get_order_ui_root():
-	return _order_ui_root
+	var s = _get_ui_root_service()
+	return s.get_order_ui_root() if s else null
 
 func add_attack_ui_root(root) -> void:
-	_attack_ui_root = root
+	var s = _get_ui_root_service()
+	if s: s.set_attack_ui_root(root)
 
 func get_attack_ui_root():
-	return _attack_ui_root
+	var s = _get_ui_root_service()
+	return s.get_attack_ui_root() if s else null
 
-# ---- Entity Management ----
+# ==================== 实体管理（委托给 EntityManager） ====================
+
 func add_order_entity(entity) -> void:
-	_order_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
-	var data_comp = entity.get_component(ComponentNames.DATA)
-	if data_comp and data_comp.data:
-		var data = data_comp.data
-		if data.get("type") == GameConsts.OrderType_Self:
-			_order_self_entities.append(entity)
-		elif data.get("type") == GameConsts.OrderType_Enermy:
-			_order_enermy_entities.append(entity)
 
 func remove_order_self_entity(entity) -> void:
-	var idx = _order_self_entities.find(entity)
-	if idx != -1:
-		_order_self_entities.remove_at(idx)
-	idx = _order_entities.find(entity)
-	if idx != -1:
-		_order_entities.remove_at(idx)
-	_entity_map.erase(entity.get_id())
 	if _entity_manager:
 		_entity_manager.unregister_entity(entity)
 
 func remove_order_enermy_entity(entity) -> void:
-	var idx = _order_enermy_entities.find(entity)
-	if idx != -1:
-		_order_enermy_entities.remove_at(idx)
-	idx = _order_entities.find(entity)
-	if idx != -1:
-		_order_entities.remove_at(idx)
-	_entity_map.erase(entity.get_id())
 	if _entity_manager:
 		_entity_manager.unregister_entity(entity)
 
 func get_order_entities() -> Array:
-	return _order_entities
+	if not _entity_manager:
+		return []
+	var result = _entity_manager.get_by_type(EntityType.ORDER_SELF)
+	result.append_array(_entity_manager.get_by_type(EntityType.ORDER_ENEMY))
+	return result
 
 func add_element_entity(entity) -> void:
-	_element_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
+
+func get_element_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(3)  # EntityType.ELEMENT
 
 func add_launcher_entity(entity) -> void:
-	_launcher_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
 
+func get_launcher_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(4)  # EntityType.LAUNCHER
+
 func add_bullet_entity(entity) -> void:
-	_bullet_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
 
 func get_bullet_entities() -> Array:
-	return _bullet_entities
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(5)  # EntityType.BULLET
 
 func add_shot_entity(entity) -> void:
-	_shot_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
 
 func get_shot_entities() -> Array:
-	return _shot_entities
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(6)  # EntityType.SHOT
+
+func add_shop_entity(entity) -> void:
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
+
+func remove_shop_entity(entity) -> void:
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
+
+func get_shop_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(7)  # EntityType.SHOP
+
+func add_event_entity(entity) -> void:
+	if _entity_manager:
+		_entity_manager.register_entity(entity)
+
+func remove_event_entity(entity) -> void:
+	if _entity_manager:
+		_entity_manager.unregister_entity(entity)
+
+func get_event_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(8)  # EntityType.EVENT
+
+func get_order_self_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(1)  # EntityType.ORDER_SELF
+
+func get_order_enermy_entities() -> Array:
+	if not _entity_manager:
+		return []
+	return _entity_manager.get_by_type(2)  # EntityType.ORDER_ENEMY
+
+func get_order_self_entity():
+	var list = get_order_self_entities()
+	return list[0] if not list.is_empty() else null
+
+func get_all_self_entities() -> Array:
+	return get_order_self_entities()
+
+func get_entity_by_id(entity_id: String):
+	if _entity_manager:
+		return _entity_manager.get_by_id(entity_id)
+	return null
 
 func get_empty_element_entity():
-	for entity in _element_entities:
+	for entity in get_element_entities():
 		var data_comp = entity.get_component(ComponentNames.DATA)
 		if not data_comp or not data_comp.data:
 			return entity
 	return null
 
-# 根据发射器配置从 MetaConsts 中选择合适的子弹数据
-func _get_element_type(element_meta: Dictionary) -> int:
-	if not element_meta:
-		return 0
-	var element_types = element_meta.get("elementType")
-	if not element_types:
-		return 0
-	var list = []
-	if element_types is Array:
-		for it in element_types:
-			if it is int:
-				list.append({"type": it, "weight": 1})
-			elif it is Dictionary:
-				var t = it.get("type", it.get("elementType", null))
-				var w = it.get("weight", 1)
-				if t != null:
-					list.append({"type": t, "weight": max(0, w if w is int else 1)})
-	elif element_types is Dictionary:
-		var t = element_types.get("type", element_types.get("elementType", null))
-		var w = element_types.get("weight", 1)
-		if t != null:
-			list.append({"type": t, "weight": max(0, w if w is int else 1)})
-	if list.is_empty():
-		return 0
-	var total = 0
-	for item in list:
-		total += item.weight
-	if total <= 0:
-		total = list.size()
-		for item in list:
-			item.weight = 1
-	var rnd = randf() * total
-	var acc = 0
-	for item in list:
-		acc += item.weight
-		if rnd < acc:
-			return item.type
-	return list[-1].type
-
-func create_element_data(id: int) -> Dictionary:
-	var DEFAULT_BULLET_ID = 8001
-	var element_meta = MetaConsts.get("launchers", {}).get(id, null)
-	if not element_meta:
-		var fallback_meta = MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
-		if fallback_meta:
-			return {
-				"id": fallback_meta.get("id", DEFAULT_BULLET_ID),
-				"type": fallback_meta.get("type", 1),
-				"atk": fallback_meta.get("atk", 0),
-				"distance": fallback_meta.get("distance", fallback_meta.get("range", 0)),
-				"cover": fallback_meta.get("cover", 0),
-				"elementType": fallback_meta.get("elementType", 0),
-			}
-		return {"id": DEFAULT_BULLET_ID, "type": 1, "elementType": 0}
-	var chosen_element_type = _get_element_type(element_meta)
-	var TYPE_TO_BULLET = {
-		1: 1001, # 火
-		2: 2001, # 水
-		3: 4001, # 风
-		4: 6001, # 土
-		0: 8001, # 无属性
-	}
-	var bullet_id = TYPE_TO_BULLET.get(chosen_element_type, DEFAULT_BULLET_ID)
-	var bullet_meta = MetaConsts.get("elements", {}).get(bullet_id, null)
-	var meta = bullet_meta if bullet_meta else MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
-	if meta:
-		return {
-			"id": meta.get("id", bullet_id),
-			"type": meta.get("type", 1),
-			"atk": meta.get("atk", 0),
-			"distance": meta.get("distance", meta.get("range", 0)),
-			"cover": meta.get("cover", 0),
-			"elementType": meta.get("elementType", chosen_element_type),
-		}
-	return {"id": bullet_id, "type": 1, "elementType": chosen_element_type}
-
-func can_element_merge(e1, e2) -> bool:
-	var data1 = e1.get_component(ComponentNames.DATA).data if e1.get_component(ComponentNames.DATA) else null
-	var data2 = e2.get_component(ComponentNames.DATA).data if e2.get_component(ComponentNames.DATA) else null
-	if data1 and data2:
-		var meta = MetaConsts.get("elements", {}).get(data2["id"], null)
-		return data1["id"] == data2["id"] and meta and meta.get("mergeId", 0) > 0
-	return false
-
-func get_element_merge_output_data(entity) -> Dictionary:
-	var data_comp = entity.get_component(ComponentNames.DATA)
-	if data_comp and data_comp.data:
-		var data = data_comp.data
-		var meta = MetaConsts.get("elements", {}).get(data["id"], null)
-		if meta:
-			return {"id": meta["mergeId"], "type": 1}
-	return {}
-
-func add_stage(value) -> void:
-	_stages.append(value)
-
-func get_stages() -> Array:
-	return _stages
-
-func reset_stages() -> void:
-	_stages.clear()
-
-func get_order_self_entities() -> Array:
-	return _order_self_entities
-
-func add_shop_entity(entity) -> void:
-	_shop_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
-	if _entity_manager:
-		_entity_manager.register_entity(entity)
-
-func remove_shop_entity(entity) -> void:
-	var idx = _shop_entities.find(entity)
-	if idx != -1:
-		_shop_entities.remove_at(idx)
-	_entity_map.erase(entity.get_id())
-	if _entity_manager:
-		_entity_manager.unregister_entity(entity)
-
-func get_shop_entities() -> Array:
-	return _shop_entities
-
-func add_event_entity(entity) -> void:
-	_event_entities.append(entity)
-	_entity_map[entity.get_id()] = entity
-	if _entity_manager:
-		_entity_manager.register_entity(entity)
-
-func remove_event_entity(entity) -> void:
-	var idx = _event_entities.find(entity)
-	if idx != -1:
-		_event_entities.remove_at(idx)
-	_entity_map.erase(entity.get_id())
-	if _entity_manager:
-		_entity_manager.unregister_entity(entity)
-
-func get_event_entities() -> Array:
-	return _event_entities
+# ==================== 移除所有实体 ====================
 
 func remove_all_entities() -> void:
-	for entity in _element_entities:
-		entity.dispose()
-	for entity in _launcher_entities:
-		entity.dispose()
-	for entity in _bullet_entities:
-		entity.dispose()
-	for entity in _order_entities:
-		entity.dispose()
-	for entity in _shop_entities:
-		entity.dispose()
-	for entity in _event_entities:
-		entity.dispose()
-	_element_entities.clear()
-	_launcher_entities.clear()
-	_bullet_entities.clear()
-	_shot_entities.clear()
-	_order_entities.clear()
-	_order_self_entities.clear()
-	_order_enermy_entities.clear()
-	_shop_entities.clear()
-	_event_entities.clear()
-	_stages.clear()
-	_round_total_step = 0
-	_cur_game_type = 1
-	_cur_level = 0
-	_cur_round_idx = 0
-	_element_ui_root = null
-	_order_ui_root = null
-	_game_data = null
-	_entity_map.clear()
+	if _entity_manager:
+		_entity_manager.clear_all()
+	_init_flag = false
 	clear_items()
 	clear_currencies()
 
-func get_order_enermy_entities() -> Array:
-	return _order_enermy_entities
+# ==================== 步数 ====================
 
 func add_round_total_step(value: int = 1) -> void:
-	_round_total_step += value
+	var s = _get_game_state_service()
+	if s: s.add_round_total_step(value)
 
 func get_round_total_step() -> int:
-	return _round_total_step
+	var s = _get_game_state_service()
+	return s.get_round_total_step() if s else 0
 
 func reset_round_total_step() -> void:
-	_round_total_step = 0
+	var s = _get_game_state_service()
+	if s: s.reset_round_total_step()
 
 func get_step_progress() -> Dictionary:
-	var round_meta = get_cur_round_meta()
-	var max_step = round_meta.get("step", 0) if round_meta else 0
-	var current = _round_total_step
-	var progress = float(current) / float(max_step) if max_step > 0 else 0.0
-	return {
-		"current": current,
-		"max": max_step,
-		"progress": progress
-	}
+	var s = _get_game_state_service()
+	return s.get_step_progress() if s else {"current": 0, "max": 0, "progress": 0.0}
 
 func update_step() -> void:
 	add_round_total_step()
-	for entity in _order_enermy_entities:
+	for entity in get_order_enermy_entities():
 		var data_comp = entity.get_component(ComponentNames.DATA)
 		if data_comp and data_comp.data:
 			var data = data_comp.data
@@ -400,74 +266,225 @@ func update_step() -> void:
 			if step and not data.get("isPreAtker", false):
 				data["step"] = step - 1
 
+# ==================== 关卡/回合（委托给 GameStateService） ====================
+
 func get_cur_game_type() -> int:
-	return _cur_game_type
+	var s = _get_game_state_service()
+	return s.get_cur_game_type() if s else 1
 
 func get_cur_level() -> int:
-	return _cur_level
+	var s = _get_game_state_service()
+	return s.get_cur_level() if s else 0
 
 func set_cur_level(value: int) -> void:
-	_cur_level = value
+	var s = _get_game_state_service()
+	if s: s.set_cur_level(value)
 
 func to_next_level() -> void:
-	if _runtime_map:
-		reset_round()
-		set_cur_level(-2)
-		return
-	reset_round()
-	var cur_level = get_cur_level()
-	var next_levels = MetaConsts.get("gameLevels", {}).get(cur_level, {}).get("next", [])
-	if not next_levels.is_empty():
-		set_cur_level(-1)
-		set_cur_level(next_levels[0])
-	else:
-		set_cur_level(-2)
+	var s = _get_game_state_service()
+	if s: s.to_next_level()
 
 func reset_round() -> void:
-	_cur_round_idx = 0
+	var s = _get_game_state_service()
+	if s: s.reset_round()
 
 func add_round() -> void:
-	if _runtime_map:
-		if _cur_round_idx < _runtime_map.layers.size() - 1:
-			_cur_round_idx += 1
-		return
-	var cur_level = get_cur_level()
-	var round_ids = MetaConsts.get("gameLevels", {}).get(cur_level, {}).get("rounds", [])
-	if _cur_round_idx < round_ids.size() - 1:
-		_cur_round_idx += 1
+	var s = _get_game_state_service()
+	if s: s.add_round()
 
 func get_cur_round_idx() -> int:
-	return _cur_round_idx
+	var s = _get_game_state_service()
+	return s.get_cur_round_idx() if s else 0
 
 func get_cur_round_meta() -> Dictionary:
-	if _runtime_map:
-		var node = _runtime_map.layers[_cur_round_idx]
-		if node and node.get("roundId"):
-			var round_data = _runtime_map.game_rounds.get(node.roundId)
-			if round_data:
-				return round_data
-	var cur_level = get_cur_level()
-	var cur_round_idx = get_cur_round_idx()
-	var round_ids = MetaConsts.get("gameLevels", {}).get(cur_level, {}).get("rounds", [])
-	if cur_round_idx < round_ids.size():
-		var round_id = round_ids[cur_round_idx]
-		return MetaConsts.get("gameRounds", {}).get(round_id, {})
-	return {}
+	var s = _get_game_state_service()
+	return s.get_cur_round_meta() if s else {}
 
 func is_cur_round_finish() -> bool:
-	if _runtime_map:
-		return _cur_round_idx >= _runtime_map.layers.size() - 1
-	var cur_level = get_cur_level()
-	var round_ids = MetaConsts.get("gameLevels", {}).get(cur_level, {}).get("rounds", [])
-	return _cur_round_idx >= round_ids.size() - 1
+	var s = _get_game_state_service()
+	return s.is_cur_round_finish() if s else true
+
+func has_alive_self() -> bool:
+	for entity in get_order_self_entities():
+		var data_comp = entity.get_component(ComponentNames.DATA)
+		if data_comp and data_comp.data:
+			var hp = data_comp.data.get("hp", 0)
+			if hp > 0:
+				return true
+	return false
+
+func get_self_entity_by_uid(runtime_uid):
+	for entity in get_order_self_entities():
+		if entity.uid == runtime_uid:
+			return entity
+	return null
+
+# ==================== Stages ====================
+
+func add_stage(value) -> void:
+	var s = _get_game_state_service()
+	if s: s.add_stage(value)
+
+func get_stages() -> Array:
+	var s = _get_game_state_service()
+	return s.get_stages() if s else []
+
+func reset_stages() -> void:
+	var s = _get_game_state_service()
+	if s: s.reset_stages()
+
+# ==================== UI 临时数据（委托给 GameStateService） ====================
+
+func set_ui_temp_data(difficulty: int, seed: int) -> void:
+	var s = _get_game_state_service()
+	if s: s.set_ui_temp_data(difficulty, seed)
+
+func get_ui_temp_difficulty() -> int:
+	var s = _get_game_state_service()
+	return s.get_ui_temp_difficulty() if s else 5
+
+func get_ui_temp_seed() -> int:
+	var s = _get_game_state_service()
+	return s.get_ui_temp_seed() if s else 0
+
+# ==================== 运行时地图（委托给 GameStateService） ====================
+
+func set_runtime_map(map_model) -> void:
+	var s = _get_game_state_service()
+	if s: s.set_runtime_map(map_model)
+
+func clear_runtime_map() -> void:
+	var s = _get_game_state_service()
+	if s: s.clear_runtime_map()
+
+func has_runtime_map() -> bool:
+	var s = _get_game_state_service()
+	return s.has_runtime_map() if s else false
+
+func get_runtime_map():
+	var s = _get_game_state_service()
+	return s.get_runtime_map() if s else null
+
+# ==================== 选择数据（委托给 GameStateService） ====================
+
+func set_select_launchers(value: Array) -> void:
+	var s = _get_game_state_service()
+	if s: s.set_select_launchers(value)
+
+func set_select_order_self_id(value: int) -> void:
+	var s = _get_game_state_service()
+	if s: s.set_select_order_self_id(value)
+
+func get_selected_character_template_id() -> int:
+	var s = _get_game_state_service()
+	return s.get_selected_character_template_id() if s else 0
+
+func get_selected_character_template() -> Dictionary:
+	var s = _get_game_state_service()
+	return s.get_selected_character_template() if s else {}
+
+# ==================== 物品/货币（委托给 InventoryService） ====================
+
+func add_item(item_id: int, count: int = 1) -> void:
+	var s = _get_inventory_service()
+	if s: s.add_item(item_id, count)
+
+func remove_item(item_id: int, count: int = 1) -> void:
+	var s = _get_inventory_service()
+	if s: s.remove_item(item_id, count)
+
+func get_item_count(item_id: int) -> int:
+	var s = _get_inventory_service()
+	return s.get_item_count(item_id) if s else 0
+
+func has_item(item_id: int, count: int = 1) -> bool:
+	var s = _get_inventory_service()
+	return s.has_item(item_id, count) if s else false
+
+func get_all_items() -> Dictionary:
+	var s = _get_inventory_service()
+	return s.get_all_items() if s else {}
+
+func clear_items() -> void:
+	var s = _get_inventory_service()
+	if s: s.clear_items()
+
+func add_currency(currency_id: int, count: int = 1) -> void:
+	var s = _get_inventory_service()
+	if s: s.add_currency(currency_id, count)
+
+func remove_currency(currency_id: int, count: int = 1) -> void:
+	var s = _get_inventory_service()
+	if s: s.remove_currency(currency_id, count)
+
+func get_currency_count(currency_id: int) -> int:
+	var s = _get_inventory_service()
+	return s.get_currency_count(currency_id) if s else 0
+
+func has_enough_currency(currency_id: int, value: int) -> bool:
+	var s = _get_inventory_service()
+	return s.has_enough_currency(currency_id, value) if s else false
+
+func spend_currency(currency_id: int, value: int) -> bool:
+	var s = _get_inventory_service()
+	return s.spend_currency(currency_id, value) if s else false
+
+func get_all_currencies() -> Dictionary:
+	var s = _get_inventory_service()
+	return s.get_all_currencies() if s else {}
+
+func clear_currencies() -> void:
+	var s = _get_inventory_service()
+	if s: s.clear_currencies()
+
+# ==================== 存档/游戏数据（委托给 PersistenceService） ====================
 
 func get_cur_game_data():
-	return _game_data
+	var s = _get_persistence_service()
+	return s.get_cur_game_data() if s else null
 
-func prepare_game_data_for_save() -> void:
-	if not _game_data:
-		return
-	var sync_entity_list = func(list):
+func create_new_game_data(record_json = null) -> Dictionary:
+	var s = _get_persistence_service()
+	if not s:
+		return {}
+	var gs = _get_game_state_service()
+	var launchers = gs.get_select_launchers() if gs else []
+	var self_id = gs.get_selected_character_template_id() if gs else 0
+	var level = gs.get_cur_level() if gs else 0
+	var round_idx = gs.get_cur_round_idx() if gs else 0
+	var map = gs.get_runtime_map() if gs else null
+	return s.create_new_game_data(record_json, launchers, self_id, level, round_idx, map)
+
+func save_game() -> Dictionary:
+	var s = _get_persistence_service()
+	var gs = _get_game_state_service()
+	var inv = _get_inventory_service()
+	if s and gs and inv:
+		save_game_to_data()
+		return s.save_game(gs, inv)
+	return {}
+
+func load_game(save_data: Dictionary) -> bool:
+	var s = _get_persistence_service()
+	if s:
+		remove_all_entities()
+		return s.load_game(save_data)
+	return false
+
+func save_game_to_data() -> void:
+	# 将实体数据同步到存档数据
+	var all_types = [
+		get_element_entities(),
+		get_launcher_entities(),
+		get_bullet_entities(),
+		get_shot_entities(),
+		get_order_entities(),
+		get_order_self_entities(),
+		get_order_enermy_entities(),
+		get_shop_entities(),
+		get_event_entities(),
+	]
+	for list in all_types:
 		for entity in list:
 			if entity and entity.has_method("sync_to_data"):
 				entity.sync_to_data()
@@ -476,171 +493,24 @@ func prepare_game_data_for_save() -> void:
 				var buff_comp = entity.get_component(ComponentNames.BUFF)
 				if data_comp and data_comp.data and buff_comp and buff_comp.has_method("to_json"):
 					data_comp.data["buffs"] = buff_comp.to_json()
-	sync_entity_list.call(_element_entities)
-	sync_entity_list.call(_launcher_entities)
-	sync_entity_list.call(_bullet_entities)
-	sync_entity_list.call(_shot_entities)
-	sync_entity_list.call(_order_entities)
-	sync_entity_list.call(_order_self_entities)
-	sync_entity_list.call(_order_enermy_entities)
-	sync_entity_list.call(_shop_entities)
-	sync_entity_list.call(_event_entities)
 
-func set_select_launchers(value: Array) -> void:
-	_select_launchers = value
-
-func set_select_order_self_id(value: int) -> void:
-	_select_order_self_id = value
-
-func get_selected_character_template_id() -> int:
-	return _select_order_self_id
-
-func get_selected_character_template() -> Dictionary:
-	if not _select_order_self_id:
-		return {}
-	return MetaConsts.get("orderSelf", {}).get(_select_order_self_id, {})
-
-func get_all_self_entities() -> Array:
-	return _order_self_entities.duplicate()
-
-func get_order_self_entity():
-	return _order_self_entities[0] if not _order_self_entities.is_empty() else null
-
-func get_all_self_datas() -> Array:
-	if not _game_data or not _game_data.get("orderSelf"):
-		return []
-	return _game_data.orderSelf.duplicate()
-
-func get_order_self_data():
-	if not _game_data or not _game_data.get("orderSelf"):
-		return null
-	var order_self = _game_data.orderSelf
-	return order_self[0] if not order_self.is_empty() else null
-
-func has_alive_self() -> bool:
-	for entity in _order_self_entities:
-		var data_comp = entity.get_component(ComponentNames.DATA)
-		if data_comp and data_comp.data:
-			var hp = data_comp.data.get("hp", 0)
-			if hp > 0:
-				return true
-	return false
-
-func get_self_entity_by_uid(runtime_uid) -> EntityBase:
-	for entity in _order_self_entities:
-		if entity.uid == runtime_uid:
-			return entity
-	return null
-
-func create_new_game_data(record_json = null):
-	var data = GameData.new()
-	if record_json:
-		data.load(record_json)
-		_items = data.items.duplicate() if data.items else {}
-		_currencies = data.currencies.duplicate() if data.currencies else {}
-		_cur_level = data.level
-		_cur_round_idx = data.round
-	else:
-		var init_data = {}
-		init_data["launchers"] = {
-			0: MetaConsts.get("launchers", {}).get(_select_launchers[0], {}) if _select_launchers.size() > 0 else {},
-			1: MetaConsts.get("launchers", {}).get(_select_launchers[1], {}) if _select_launchers.size() > 1 else {},
-		}
-		init_data["elements"] = {}
-		init_data["shots"] = {}
-		init_data["orderSelfId"] = _select_order_self_id
-		init_data["orderShop"] = []
-		
-		var cur_game_type = get_cur_game_type()
-		var cur_round_idx = get_cur_round_idx()
-		var round_meta = {}
-		
-		if _runtime_map:
-			var node = _runtime_map.layers[cur_round_idx]
-			if node and node.get("roundId"):
-				round_meta = _runtime_map.game_rounds.get(node.roundId, {})
-		
-		if round_meta.is_empty():
-			var level_id = MetaConsts.get("gameStartLevel", {}).get(cur_game_type, 0)
-			set_cur_level(level_id)
-			var level_meta = MetaConsts.get("gameLevels", {}).get(level_id, {})
-			var round_ids = level_meta.get("rounds", [])
-			if cur_round_idx < round_ids.size():
-				var round_id = round_ids[cur_round_idx]
-				round_meta = MetaConsts.get("gameRounds", {}).get(round_id, {})
-		
-		# 生成敌方单位
-		init_data["orderEnermy"] = []
-		var order_enermy_ids = round_meta.get("orderEnermyPool", [])
-		for order_enermy_id in order_enermy_ids:
-			var order_enermy_meta = MetaConsts.get("orderEnermy", {}).get(order_enermy_id, {})
-			init_data["orderEnermy"].append({
-				"id": order_enermy_meta.get("id", 0),
-				"hp": order_enermy_meta.get("hp", 100),
-				"def": order_enermy_meta.get("def", 0),
-				"atk": order_enermy_meta.get("atk", 0),
-				"step": order_enermy_meta.get("step", 0),
-				"type": GameConsts.OrderType_Enermy,
-				"isAtker": 0,
-				"buff": 0,
-				"bullets": [],
-			})
-		
-		# 生成己方单位
-		init_data["orderSelf"] = []
-		var order_self_meta = MetaConsts.get("orderSelf", {}).get(_select_order_self_id, {})
-		init_data["orderSelf"].append({
-			"id": order_self_meta.get("id", 0),
-			"hp": order_self_meta.get("hp", 100),
-			"def": order_self_meta.get("def", 0),
-			"atk": order_self_meta.get("atk", 0),
-			"step": order_self_meta.get("step", 0),
-			"type": GameConsts.OrderType_Self,
-			"isAtker": 0,
-			"buff": 0,
-			"bullets": [],
-		})
-		
-		init_data["level"] = _cur_level
-		init_data["round"] = _cur_round_idx
-		
-		data.load(init_data)
-		clear_items()
-		clear_currencies()
-	
-	_game_data = data
-	return data
-
-func save_game() -> Dictionary:
-	if not _game_data:
-		return {}
-	prepare_game_data_for_save()
-	_game_data.level = _cur_level
-	_game_data.round = _cur_round_idx
-	_game_data.items = _items.duplicate()
-	_game_data.currencies = _currencies.duplicate()
-	return _game_data.to_json()
-
-func load_game(save_data: Dictionary) -> bool:
-	if not GameData.is_valid(save_data):
-		return false
-	remove_all_entities()
-	create_new_game_data(save_data)
-	return true
+# 保留原方法名兼容
+func prepare_game_data_for_save() -> void:
+	save_game_to_data()
 
 func remove_order_game_data(data: Dictionary) -> void:
-	if data.is_empty():
-		return
-	var type_val = data.get("type", -1)
-	match type_val:
-		GameConsts.OrderType_Self:
-			var idx = _game_data.orderSelf.find(data)
-			if idx != -1:
-				_game_data.orderSelf.remove_at(idx)
-		GameConsts.OrderType_Enermy:
-			var idx = _game_data.orderEnermy.find(data)
-			if idx != -1:
-				_game_data.orderEnermy.remove_at(idx)
+	var s = _get_persistence_service()
+	if s: s.remove_order_game_data(data)
+
+func get_order_self_data():
+	var s = _get_persistence_service()
+	return s.get_order_self_data() if s else {}
+
+func get_all_self_datas() -> Array:
+	var s = _get_persistence_service()
+	return s.get_all_self_datas() if s else []
+
+# ==================== 难度/敌人 ====================
 
 func process_order_defeated(entity) -> void:
 	var data_comp = entity.get_component(ComponentNames.DATA)
@@ -712,106 +582,96 @@ func _get_difficulty_config(round_meta: Dictionary) -> Dictionary:
 	var difficulty_config = MetaConsts.get("difficultyCurves", {}).get(difficulty_type, {})
 	return difficulty_config if not difficulty_config.is_empty() else MetaConsts.get("difficultyCurves", {}).get("normal", {})
 
-# ---- UI 临时数据（用于界面间传递参数）----
-func set_ui_temp_data(difficulty: int, seed: int) -> void:
-	_temp_ui_difficulty = difficulty
-	_temp_ui_seed = seed
+# ==================== 元素工具方法（保留原实现，不依赖服务） ====================
 
-func get_ui_temp_difficulty() -> int:
-	return _temp_ui_difficulty
+func can_element_merge(e1, e2) -> bool:
+	var data1 = e1.get_component(ComponentNames.DATA).data if e1.get_component(ComponentNames.DATA) else null
+	var data2 = e2.get_component(ComponentNames.DATA).data if e2.get_component(ComponentNames.DATA) else null
+	if data1 and data2:
+		var meta = MetaConsts.get("elements", {}).get(data2["id"], null)
+		return data1["id"] == data2["id"] and meta and meta.get("mergeId", 0) > 0
+	return false
 
-func get_ui_temp_seed() -> int:
-	return _temp_ui_seed
+func get_element_merge_output_data(entity) -> Dictionary:
+	var data_comp = entity.get_component(ComponentNames.DATA)
+	if data_comp and data_comp.data:
+		var data = data_comp.data
+		var meta = MetaConsts.get("elements", {}).get(data["id"], null)
+		if meta:
+			return {"id": meta["mergeId"], "type": 1}
+	return {}
 
-func set_runtime_map(map_model) -> void:
-	_runtime_map = map_model
-	_cur_level = 0
-	_cur_round_idx = 0
+func create_element_data(id: int) -> Dictionary:
+	var DEFAULT_BULLET_ID = 8001
+	var element_meta = MetaConsts.get("launchers", {}).get(id, null)
+	if not element_meta:
+		var fallback_meta = MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
+		if fallback_meta:
+			return {
+				"id": fallback_meta.get("id", DEFAULT_BULLET_ID),
+				"type": fallback_meta.get("type", 1),
+				"atk": fallback_meta.get("atk", 0),
+				"distance": fallback_meta.get("distance", fallback_meta.get("range", 0)),
+				"cover": fallback_meta.get("cover", 0),
+				"elementType": fallback_meta.get("elementType", 0),
+			}
+		return {"id": DEFAULT_BULLET_ID, "type": 1, "elementType": 0}
+	var chosen_element_type = _get_element_type(element_meta)
+	var TYPE_TO_BULLET = {
+		1: 1001, # 火
+		2: 2001, # 水
+		3: 4001, # 风
+		4: 6001, # 土
+		0: 8001, # 无属性
+	}
+	var bullet_id = TYPE_TO_BULLET.get(chosen_element_type, DEFAULT_BULLET_ID)
+	var bullet_meta = MetaConsts.get("elements", {}).get(bullet_id, null)
+	var meta = bullet_meta if bullet_meta else MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
+	if meta:
+		return {
+			"id": meta.get("id", bullet_id),
+			"type": meta.get("type", 1),
+			"atk": meta.get("atk", 0),
+			"distance": meta.get("distance", meta.get("range", 0)),
+			"cover": meta.get("cover", 0),
+			"elementType": meta.get("elementType", chosen_element_type),
+		}
+	return {"id": bullet_id, "type": 1, "elementType": chosen_element_type}
 
-func clear_runtime_map() -> void:
-	_runtime_map = null
-
-func get_entity_by_id(entity_id: String):
-	return _entity_map.get(entity_id, null)
-
-func get_element_entities() -> Array:
-	return _element_entities
-
-func get_launcher_entities() -> Array:
-	return _launcher_entities
-
-func add_item(item_id: int, count: int = 1) -> void:
-	_items[item_id] = _items.get(item_id, 0) + count
-
-func remove_item(item_id: int, count: int = 1) -> void:
-	var current = _items.get(item_id, 0)
-	if current <= count:
-		_items.erase(item_id)
-	else:
-		_items[item_id] = current - count
-
-func get_item_count(item_id: int) -> int:
-	return _items.get(item_id, 0)
-
-func clear_items() -> void:
-	_items.clear()
-
-func add_currency(currency_id: int, count: int = 1) -> void:
-	_currencies[currency_id] = _currencies.get(currency_id, 0) + count
-
-func remove_currency(currency_id: int, count: int = 1) -> void:
-	var current = _currencies.get(currency_id, 0)
-	if current <= count:
-		_currencies.erase(currency_id)
-	else:
-		_currencies[currency_id] = current - count
-
-func get_currency_count(currency_id: int) -> int:
-	return _currencies.get(currency_id, 0)
-
-func clear_currencies() -> void:
-	_currencies.clear()
-
-func has_runtime_map() -> bool:
-	return _runtime_map != null
-
-func get_runtime_map():
-	return _runtime_map
-
-# 检查是否拥有足够数量的道具
-func has_item(item_id: int, count: int = 1) -> bool:
-	return get_item_count(item_id) >= count
-
-# 获取全部道具映射表
-func get_all_items() -> Dictionary:
-	return _items.duplicate()
-
-# 获取全部货币映射表
-func get_all_currencies() -> Dictionary:
-	return _currencies.duplicate()
-
-# 检查货币是否足够
-func has_enough_currency(currency_id: int, value: int) -> bool:
-	return get_currency_count(currency_id) >= value
-
-# 消费货币（消耗指定数量，余额不足返回false）
-func spend_currency(currency_id: int, value: int) -> bool:
-	if not has_enough_currency(currency_id, value):
-		return false
-	_currencies[currency_id] = _currencies.get(currency_id, 0) - value
-	if _currencies[currency_id] <= 0:
-		_currencies.erase(currency_id)
-	return true
-
-# 根据实体类型自动添加到对应列表
-func add_entity(entity) -> void:
-	if not entity:
-		return
-	if entity.has_method("get_component"):
-		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
-		if data_comp and data_comp.data:
-			var type_val = data_comp.data.get("type", 0)
-			if type_val == GameConsts.OrderType_Self or type_val == GameConsts.OrderType_Enermy:
-				add_order_entity(entity)
-				return
-	add_element_entity(entity)
+func _get_element_type(element_meta: Dictionary) -> int:
+	if not element_meta:
+		return 0
+	var element_types = element_meta.get("elementType")
+	if not element_types:
+		return 0
+	var list = []
+	if element_types is Array:
+		for it in element_types:
+			if it is int:
+				list.append({"type": it, "weight": 1})
+			elif it is Dictionary:
+				var t = it.get("type", it.get("elementType", null))
+				var w = it.get("weight", 1)
+				if t != null:
+					list.append({"type": t, "weight": max(0, w if w is int else 1)})
+	elif element_types is Dictionary:
+		var t = element_types.get("type", element_types.get("elementType", null))
+		var w = element_types.get("weight", 1)
+		if t != null:
+			list.append({"type": t, "weight": max(0, w if w is int else 1)})
+	if list.is_empty():
+		return 0
+	var total = 0
+	for item in list:
+		total += item.weight
+	if total <= 0:
+		total = list.size()
+		for item in list:
+			item.weight = 1
+	var rnd = randf() * total
+	var acc = 0
+	for item in list:
+		acc += item.weight
+		if rnd < acc:
+			return item.type
+	return list[-1].type

@@ -6,6 +6,9 @@ extends BaseEntity
 
 class_name BaseEventEntity
 
+func get_entity_type() -> int:
+	return EntityType.EVENT
+
 var event_id: int = 0
 var event_type: String = ""
 

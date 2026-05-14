@@ -88,6 +88,28 @@ func get_ui_root_manager():
 		return null
 	return _world.ui_root_manager
 
+# ==================== 新服务层 API ====================
+
+func get_game_state_service():
+	if not _world:
+		return null
+	return _world.game_state_service
+
+func get_inventory_service():
+	if not _world:
+		return null
+	return _world.inventory_service
+
+func get_persistence_service():
+	if not _world:
+		return null
+	return _world.persistence_service
+
+func get_ui_root_service():
+	if not _world:
+		return null
+	return _world.ui_root_service
+
 func get_save_game_data() -> Dictionary:
 	var wdm = WorldDataManager
 	wdm.prepare_game_data_for_save()
