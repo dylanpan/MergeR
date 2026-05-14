@@ -11,7 +11,7 @@ func on_enter() -> Dictionary:
 func on_confirm() -> void:
 	var self_entity = WorldDataManager.get_order_self_entity()
 	if self_entity:
-		var data_comp = self_entity.get_component("Data") as DataComponent
+		var data_comp = self_entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			data_comp.data["atk"] = data_comp.data.get("atk", 0) + 3
 

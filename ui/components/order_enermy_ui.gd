@@ -56,7 +56,7 @@ func _init_role() -> void:
 		return
 	var node_order = get_node("nodeOrder")
 	if node_order.has_node("spRole"):
-		var data_comp = entity.get_component("Data") if entity.has_method("get_component") else null
+		var data_comp = entity.get_component(ComponentNames.DATA) if entity.has_method("get_component") else null
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
@@ -81,7 +81,7 @@ func _init_hp() -> void:
 		return
 	var node_order = get_node("nodeOrder")
 	if node_order.has_node("lbHp") and node_order.get_node("lbHp") is Label:
-		var data_comp = entity.get_component("Data") if entity.has_method("get_component") else null
+		var data_comp = entity.get_component(ComponentNames.DATA) if entity.has_method("get_component") else null
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
@@ -94,7 +94,7 @@ func _init_step() -> void:
 		return
 	var node_order = get_node("nodeOrder")
 	if node_order.has_node("lbStep") and node_order.get_node("lbStep") is Label:
-		var data_comp = entity.get_component("Data") if entity.has_method("get_component") else null
+		var data_comp = entity.get_component(ComponentNames.DATA) if entity.has_method("get_component") else null
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
@@ -138,7 +138,7 @@ func _init_bullet() -> void:
 		return
 	var node_order = get_node("nodeOrder")
 	if node_order.has_node("nodeBullet"):
-		var data_comp = entity.get_component("Data") if entity.has_method("get_component") else null
+		var data_comp = entity.get_component(ComponentNames.DATA) if entity.has_method("get_component") else null
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data

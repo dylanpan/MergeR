@@ -9,7 +9,7 @@ func setup(entity) -> void:
 func _update_display() -> void:
 	if not _entity:
 		return
-	var data_comp = _entity.get_component("Data") as DataComponent
+	var data_comp = _entity.get_component(ComponentNames.DATA) as DataComponent
 	if data_comp and not data_comp.data.is_empty():
 		var hp = data_comp.data.get("hp", 0)
 		var step = data_comp.data.get("step", 0)

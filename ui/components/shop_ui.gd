@@ -42,7 +42,7 @@ func _update_item_slots() -> void:
 	if not _current_shop_entity or not has_node("itemSlots"):
 		return
 	
-	var shop_comp = _current_shop_entity.get_component("Shop") if _current_shop_entity.has_method("get_component") else null
+	var shop_comp = _current_shop_entity.get_component(ComponentNames.SHOP) if _current_shop_entity.has_method("get_component") else null
 	if not shop_comp:
 		return
 	

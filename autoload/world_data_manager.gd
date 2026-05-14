@@ -124,7 +124,7 @@ func add_order_entity(entity) -> void:
 	_entity_map[entity.get_id()] = entity
 	if _entity_manager:
 		_entity_manager.register_entity(entity)
-	var data_comp = entity.get_component("Data")
+	var data_comp = entity.get_component(ComponentNames.DATA)
 	if data_comp and data_comp.data:
 		var data = data_comp.data
 		if data.get("type") == GameConsts.OrderType_Self:
@@ -189,7 +189,7 @@ func get_shot_entities() -> Array:
 
 func get_empty_element_entity():
 	for entity in _element_entities:
-		var data_comp = entity.get_component("Data")
+		var data_comp = entity.get_component(ComponentNames.DATA)
 		if not data_comp or not data_comp.data:
 			return entity
 	return null
@@ -271,15 +271,15 @@ func create_element_data(id: int) -> Dictionary:
 	return {"id": bullet_id, "type": 1, "elementType": chosen_element_type}
 
 func can_element_merge(e1, e2) -> bool:
-	var data1 = e1.get_component("Data").data if e1.get_component("Data") else null
-	var data2 = e2.get_component("Data").data if e2.get_component("Data") else null
+	var data1 = e1.get_component(ComponentNames.DATA).data if e1.get_component(ComponentNames.DATA) else null
+	var data2 = e2.get_component(ComponentNames.DATA).data if e2.get_component(ComponentNames.DATA) else null
 	if data1 and data2:
 		var meta = MetaConsts.get("elements", {}).get(data2["id"], null)
 		return data1["id"] == data2["id"] and meta and meta.get("mergeId", 0) > 0
 	return false
 
 func get_element_merge_output_data(entity) -> Dictionary:
-	var data_comp = entity.get_component("Data")
+	var data_comp = entity.get_component(ComponentNames.DATA)
 	if data_comp and data_comp.data:
 		var data = data_comp.data
 		var meta = MetaConsts.get("elements", {}).get(data["id"], null)
@@ -393,7 +393,7 @@ func get_step_progress() -> Dictionary:
 func update_step() -> void:
 	add_round_total_step()
 	for entity in _order_enermy_entities:
-		var data_comp = entity.get_component("Data")
+		var data_comp = entity.get_component(ComponentNames.DATA)
 		if data_comp and data_comp.data:
 			var data = data_comp.data
 			var step = data.get("step", 0)
@@ -472,8 +472,8 @@ func prepare_game_data_for_save() -> void:
 			if entity and entity.has_method("sync_to_data"):
 				entity.sync_to_data()
 			elif entity and entity.has_method("get_component"):
-				var data_comp = entity.get_component("Data")
-				var buff_comp = entity.get_component("Buff")
+				var data_comp = entity.get_component(ComponentNames.DATA)
+				var buff_comp = entity.get_component(ComponentNames.BUFF)
 				if data_comp and data_comp.data and buff_comp and buff_comp.has_method("to_json"):
 					data_comp.data["buffs"] = buff_comp.to_json()
 	sync_entity_list.call(_element_entities)
@@ -519,7 +519,7 @@ func get_order_self_data():
 
 func has_alive_self() -> bool:
 	for entity in _order_self_entities:
-		var data_comp = entity.get_component("Data")
+		var data_comp = entity.get_component(ComponentNames.DATA)
 		if data_comp and data_comp.data:
 			var hp = data_comp.data.get("hp", 0)
 			if hp > 0:
@@ -643,7 +643,7 @@ func remove_order_game_data(data: Dictionary) -> void:
 				_game_data.orderEnermy.remove_at(idx)
 
 func process_order_defeated(entity) -> void:
-	var data_comp = entity.get_component("Data")
+	var data_comp = entity.get_component(ComponentNames.DATA)
 	if not data_comp or not data_comp.data:
 		return
 	var data = data_comp.data
@@ -808,7 +808,7 @@ func add_entity(entity) -> void:
 	if not entity:
 		return
 	if entity.has_method("get_component"):
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and data_comp.data:
 			var type_val = data_comp.data.get("type", 0)
 			if type_val == GameConsts.OrderType_Self or type_val == GameConsts.OrderType_Enermy:

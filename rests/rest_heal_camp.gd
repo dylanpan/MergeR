@@ -11,7 +11,7 @@ func on_enter() -> Dictionary:
 func on_confirm() -> void:
 	var self_entities = WorldDataManager.get_order_self_entities()
 	for entity in self_entities:
-		var data_comp = entity.get_component("Data") as DataComponent
+		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:
 			var max_hp = data_comp.data.get("maxHp", data_comp.data.get("hp", 100))
 			var heal_amount = max_hp * 0.5

@@ -24,7 +24,7 @@ func update_finish_button_state() -> void:
 	var has_bullets = false
 	
 	for entity_item in bullet_entities:
-		var data_comp = entity_item.get_component("Data") if entity_item.has_method("get_component") else null
+		var data_comp = entity_item.get_component(ComponentNames.DATA) if entity_item.has_method("get_component") else null
 		if data_comp and data_comp.data:
 			if data_comp.data.get("type", 0) == 1:
 				has_bullets = true
