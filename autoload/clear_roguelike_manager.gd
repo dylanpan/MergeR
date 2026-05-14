@@ -68,27 +68,7 @@ func get_systems() -> Array:
 		return []
 	return _world.get_systems()
 
-func get_game_state_manager():
-	if not _world:
-		return null
-	return _world.game_state_manager
-
-func get_inventory_manager():
-	if not _world:
-		return null
-	return _world.inventory_manager
-
-func get_entity_service():
-	if not _world:
-		return null
-	return _world.entity_service
-
-func get_ui_root_manager():
-	if not _world:
-		return null
-	return _world.ui_root_manager
-
-# ==================== 新服务层 API ====================
+# ==================== 服务层 API（替代旧的 Manager getters） ====================
 
 func get_game_state_service():
 	if not _world:
@@ -109,6 +89,11 @@ func get_ui_root_service():
 	if not _world:
 		return null
 	return _world.ui_root_service
+
+func get_entity_service():
+	if not _world:
+		return null
+	return _world.entity_service
 
 func get_save_game_data() -> Dictionary:
 	var wdm = WorldDataManager

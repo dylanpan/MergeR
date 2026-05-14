@@ -7,19 +7,16 @@ extends Node
 
 var system_registry: SystemRegistry = null
 
-# 子管理器（新架构）
+# 实体管理层
 var entity_manager: EntityManager = null
 var entity_service: EntityService = null
 
-# 服务层（新架构 — 替代 WorldDataManager 的职责）
+# 服务层
 var game_state_service: GameStateService = null
 var inventory_service: InventoryService = null
 var persistence_service: PersistenceService = null
 var ui_root_service: UIRootService = null
-
-var game_state_manager: GameStateManager = null
-var inventory_manager: InventoryManager = null
-var ui_root_manager: UIRootManager = null
+var element_service: ElementService = null
 
 func _init():
 	system_registry = SystemRegistry.new()
@@ -31,10 +28,7 @@ func _init():
 	inventory_service = InventoryService.new()
 	persistence_service = PersistenceService.new()
 	ui_root_service = UIRootService.new()
-	
-	game_state_manager = GameStateManager.new()
-	inventory_manager = InventoryManager.new()
-	ui_root_manager = UIRootManager.new()
+	element_service = ElementService.new()
 
 func create(node = null) -> void:
 	# 使用 SystemRegistry 注册所有内置系统
@@ -44,7 +38,11 @@ func create(node = null) -> void:
 	BuffSystem.get_instance().init()
 	
 	if node:
-		ui_root_manager.setup_from_node(node)
+		ui_root_service.set_element_ui_root(node.get_element_ui_root() if node.has_method("get_element_ui_root") else null)
+		ui_root_service.set_launcher_ui_root(node.get_launcher_ui_root() if node.has_method("get_launcher_ui_root") else null)
+		ui_root_service.set_bullet_ui_root(node.get_bullet_ui_root() if node.has_method("get_bullet_ui_root") else null)
+		ui_root_service.set_order_ui_root(node.get_order_ui_root() if node.has_method("get_order_ui_root") else null)
+		ui_root_service.set_attack_ui_root(node.get_attack_ui_root() if node.has_method("get_attack_ui_root") else null)
 
 func get_systems() -> Array:
 	return system_registry.get_all()
@@ -69,5 +67,4 @@ func destroy() -> void:
 	inventory_service.reset()
 	persistence_service.reset()
 	ui_root_service.reset()
-	game_state_manager.reset()
 	WorldDataManager.set_init_flag(false)

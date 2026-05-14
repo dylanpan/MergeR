@@ -138,10 +138,13 @@ func _add_bullet_entities(game_data) -> void:
 	# 简化：子弹由发射器生成
 	var wdm = WorldDataManager
 	var launchers = wdm.get_launcher_entities()
+	var element_service = null
+	if ClearRoguelikeManager.get_world():
+		element_service = ClearRoguelikeManager.get_world().element_service
 	for launcher in launchers:
 		var data_comp = launcher.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and not data_comp.data.is_empty():
-			var elem_data = wdm.create_element_data(data_comp.data.get("id", 0))
+			var elem_data = element_service.create_element_data(data_comp.data.get("id", 0)) if element_service else {}
 			var bullet_entity = BaseEntity.new()
 			var bullet_data_comp = DataComponent.new(elem_data)
 			bullet_entity.add_component(bullet_data_comp)
