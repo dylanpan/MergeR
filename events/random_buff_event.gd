@@ -12,6 +12,7 @@ func on_option_select(option_id: int) -> void:
 	if option_id == 1:
 		var buff_types = ["atk_up", "def_up", "shield", "heal"]
 		var selected = buff_types[randi() % buff_types.size()]
-		var self_entity = WorldDataManager.get_order_self_entity()
+		var world = ClearRoguelikeManager.get_world()
+		var self_entity = world.entity_service.get_order_self_entity() if world else null
 		if self_entity:
 			BuffSystem.get_instance().add_buff(self_entity, selected, 5.0, 5)

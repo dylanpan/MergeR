@@ -10,7 +10,8 @@ func on_enter() -> Dictionary:
 
 func on_option_select(option_id: int) -> void:
 	if option_id == 1:
-		var self_entities = WorldDataManager.get_order_self_entities()
+		var world = ClearRoguelikeManager.get_world()
+		var self_entities = world.entity_service.get_order_self() if world else []
 		for entity in self_entities:
 			var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 			if data_comp:

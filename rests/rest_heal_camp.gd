@@ -9,7 +9,8 @@ func on_enter() -> Dictionary:
 	return {"id": rest_id, "type": rest_type, "name": "治愈营地", "desc": "恢复所有己方单位50%HP"}
 
 func on_confirm() -> void:
-	var self_entities = WorldDataManager.get_order_self_entities()
+	var world = ClearRoguelikeManager.get_world()
+	var self_entities = world.entity_service.get_order_self() if world else []
 	for entity in self_entities:
 		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp:

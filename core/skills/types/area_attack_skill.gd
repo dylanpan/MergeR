@@ -13,12 +13,12 @@ func on_execute(context: Dictionary) -> void:
 	var entity_id = context.get("entityId", "")
 	
 	# 获取攻击者实体
-	var source_entity = WorldDataManager.get_entity_by_id(entity_id)
+	var source_entity = WorldHelper.get_entity_by_id(entity_id)
 	if not source_entity:
 		return
 	
 	# 获取所有敌方单位
-	var enemies = WorldDataManager.get_order_enermy_entities()
+	var enemies = WorldHelper.get_enemies()
 	
 	# 遍历对每个目标执行伤害
 	for target in enemies:

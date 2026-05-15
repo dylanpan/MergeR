@@ -15,7 +15,7 @@ func on_execute(context: Dictionary) -> void:
 	var entity_id = context.get("entityId", "")
 	
 	# 获取召唤者实体
-	var source_entity = WorldDataManager.get_entity_by_id(entity_id)
+	var source_entity = WorldHelper.get_entity_by_id(entity_id)
 	if not source_entity:
 		return
 	
@@ -39,5 +39,5 @@ func on_execute(context: Dictionary) -> void:
 		}
 		
 		var entity = OrderEnermyEntity.new(data)
-		WorldDataManager.add_order_entity(entity)
+		WorldHelper.register_entity(entity)
 		GlobalEventBus.event_on_enemy_spawn.emit(entity)

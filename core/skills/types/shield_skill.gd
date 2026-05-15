@@ -14,7 +14,7 @@ func on_execute(context: Dictionary) -> void:
 	var entity_id = context.get("entityId", "")
 	
 	# 获取实体
-	var target = WorldDataManager.get_entity_by_id(entity_id)
+	var target = WorldHelper.get_entity_by_id(entity_id)
 	if not target:
 		return
 	

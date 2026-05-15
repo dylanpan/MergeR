@@ -11,7 +11,9 @@ func on_enter() -> Dictionary:
 func on_confirm() -> void:
 	var item_ids = [60000001, 60000002, 60000003, 60000004]
 	var selected = item_ids[randi() % item_ids.size()]
-	WorldDataManager.add_item(selected, 1)
+	var world = ClearRoguelikeManager.get_world()
+	if world:
+		world.inventory_service.add_item(selected, 1)
 
 func on_skip() -> void:
 	pass

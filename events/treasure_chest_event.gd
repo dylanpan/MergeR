@@ -10,4 +10,6 @@ func on_enter() -> Dictionary:
 
 func on_option_select(option_id: int) -> void:
 	if option_id == 1:
-		WorldDataManager.add_item(60000001, randi() % 3 + 1)
+		var world = ClearRoguelikeManager.get_world()
+		if world:
+			world.inventory_service.add_item(60000001, randi() % 3 + 1)
