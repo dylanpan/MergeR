@@ -56,9 +56,13 @@ func _on_pick_closed(confirmed: Variant) -> void:
 	UIManager.open_ui("roguelike_screen")
 
 func create_world(node = null) -> void:
+	# World 继承 Node，添加到场景树以启用 _ready() 生命周期
 	var world = preload("res://core/world.gd").new()
+	world.name = "GameWorld"
 	world.create(node)
 	_world = world
+	# 将 World 添加到 Autoload 节点下，使其参与场景树
+	add_child(world)
 
 func get_world():
 	return _world
@@ -117,6 +121,10 @@ func destroy_world() -> void:
 			config.save("user://clear_roguelike_save.cfg")
 		
 		_world.destroy()
+		# 从场景树移除并释放
+		if _world.get_parent():
+			remove_child(_world)
+		_world.queue_free()
 		_world = null
 	
 	# 清理运行时地图
