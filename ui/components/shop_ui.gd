@@ -3,10 +3,6 @@ class_name ShopUI
 
 # 商店UI（替代 ShopUI.js）
 # 管理商店面板显示、购买、刷新、关闭交互
-# 使用方式：
-#   var ui = preload("res://ui/components/shop_ui.tscn").instantiate()
-#   parent.add_child(ui)
-#   ui.init()
 
 var _current_shop_entity = null
 var _is_shop_open: bool = false
@@ -64,8 +60,11 @@ func _update_item_slots() -> void:
 
 func _update_gold_display() -> void:
 	if has_node("lblGold"):
-		var player_gold = WorldDataManager.get_currency_count(1)  # 假设货币ID=1是金币
-		get_node("lblGold").text = "金币: " + str(player_gold)
+		var world = ClearRoguelikeManager.get_world()
+		var gold = 0
+		if world:
+			gold = world.inventory_service.get_currency_count(1)
+		get_node("lblGold").text = "金币: " + str(gold)
 
 func _on_item_buy(index: int) -> void:
 	if not _current_shop_entity:
@@ -78,11 +77,9 @@ func _on_item_buy(index: int) -> void:
 		_update_gold_display()
 		GlobalEventBus.event_shop_buy.emit(0, index)
 	else:
-		# 购买失败：显示提示信息
 		if has_node("lblFeedback"):
 			get_node("lblFeedback").text = "金币不足或商品已售罄！"
 			get_node("lblFeedback").visible = true
-			# 启动计时器自动隐藏提示
 			var timer = get_tree().create_timer(2.0)
 			timer.timeout.connect(func(): 
 				if has_node("lblFeedback"):

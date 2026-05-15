@@ -2,24 +2,23 @@ extends UIBase
 class_name MapPreviewScreen
 
 # 地图预览界面（替代 ClearMapPreviewController.js）
-# 通过 UIManager.open_ui("map_preview", {...}) 打开
 
 var _runtime_map = null
 var _node_components: Dictionary = {}
 var _current_node_id = null
-var _completed_node_ids: Dictionary = {}  # Set simulated with Dictionary
+var _completed_node_ids: Dictionary = {}
 
 func _ready() -> void:
 	layer_name = "popup"
 	ui_name = "map_preview"
 
 func on_opened(params = null) -> void:
-	if not WorldDataManager.has_runtime_map():
+	var session = ClearRoguelikeManager.game_session
+	if not session or not session.has_runtime_map():
 		push_warning("MapPreviewScreen: 没有运行时地图数据")
 		return
 	
-	var manager = WorldDataManager
-	_runtime_map = manager.get_runtime_map()
+	_runtime_map = session.get_runtime_map()
 	_current_node_id = params.get("current_node_id", null) if params else null
 	_completed_node_ids = params.get("completed_node_ids", {}) if params else {}
 	
@@ -30,13 +29,12 @@ func on_closed() -> void:
 	_node_components.clear()
 	_runtime_map = null
 
-# 兼容旧 API：允许作为子节点直接使用（非 UIManager 方式）
 func open(param: Dictionary = {}) -> void:
-	if not WorldDataManager.has_runtime_map():
+	var session = ClearRoguelikeManager.game_session
+	if not session or not session.has_runtime_map():
 		return
 	
-	var manager = WorldDataManager
-	_runtime_map = manager.get_runtime_map()
+	_runtime_map = session.get_runtime_map()
 	_current_node_id = param.get("current_node_id", null)
 	_completed_node_ids = param.get("completed_node_ids", {})
 	
@@ -55,7 +53,6 @@ func _init_ui() -> void:
 	var node_dialog = get_node("nodeDialog")
 	
 	if node_dialog.has_node("nodeBg") and node_dialog.get_node("nodeBg").has_node("btnBack"):
-		# 避免重复连接
 		var btn = node_dialog.get_node("nodeBg/btnBack")
 		if not btn.pressed.is_connected(_on_btn_back):
 			btn.pressed.connect(_on_btn_back)
@@ -70,13 +67,11 @@ func _init_ui() -> void:
 			total_info.get_node("lblTotalNodes").text = "共 " + str(_runtime_map.layers.size()) + " 个关卡"
 
 func _on_btn_back() -> void:
-	# 如果是在 UIManager 层级中，用框架关闭
 	if is_inside_tree():
 		var parent_layer = get_parent()
 		if parent_layer is CanvasLayer:
 			close()
 			return
-	# 否则用框架关闭
 	close()
 
 func _render_map() -> void:
@@ -87,12 +82,10 @@ func _render_map() -> void:
 		return
 	var map_container = node_dialog.get_node("nodeMapContainer")
 	
-	# 清除现有内容
 	for child in map_container.get_children():
 		map_container.remove_child(child)
 		child.queue_free()
 	
-	# 按层级分组节点
 	var layer_groups: Dictionary = {}
 	for node_data in _runtime_map.layers:
 		var level = node_data.get("level", 0)
@@ -106,7 +99,6 @@ func _render_map() -> void:
 	
 	_draw_connections(layer_groups, layer_height, map_container)
 	
-	# 渲染每个节点
 	var levels = layer_groups.keys()
 	levels.sort()
 	for level in levels:

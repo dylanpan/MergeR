@@ -16,9 +16,13 @@ func _ready() -> void:
 	ui_name = "pick_screen"
 
 func on_opened(params = null) -> void:
-	# 从 WorldDataManager 读取 difficulty_select 设置的数据
-	_difficulty = WorldDataManager.get_ui_temp_difficulty()
-	_seed = WorldDataManager.get_ui_temp_seed()
+	var session = ClearRoguelikeManager.game_session
+	if session:
+		_difficulty = session.get_ui_temp_difficulty()
+		_seed = session.get_ui_temp_seed()
+	else:
+		_difficulty = 5
+		_seed = 0
 	_select_launchers = []
 	_select_order_self_id = 0
 	
@@ -138,12 +142,14 @@ func _on_click_btn_go() -> void:
 	if _select_order_self_id == 0:
 		return
 	
-	WorldDataManager.set_select_launchers(_select_launchers)
-	WorldDataManager.set_select_order_self_id(_select_order_self_id)
-	
-	# 生成程序化地图并注入
-	var map = MapGenerator.generate_map(_difficulty, _seed)
-	WorldDataManager.set_runtime_map(map)
+	var session = ClearRoguelikeManager.game_session
+	if session:
+		session.set_select_launchers(_select_launchers)
+		session.set_select_order_self_id(_select_order_self_id)
+		
+		# 生成程序化地图并注入
+		var map = MapGenerator.generate_map(_difficulty, _seed)
+		session.set_runtime_map(map)
 	
 	# 返回 true 表示确认
 	close(true)

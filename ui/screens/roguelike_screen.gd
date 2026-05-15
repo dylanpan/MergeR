@@ -29,17 +29,21 @@ func on_closed() -> void:
 	ClearRoguelikeManager.destroy_world()
 
 func _init_data(param: Dictionary = {}) -> void:
+	var session = ClearRoguelikeManager.game_session
+	if not session:
+		return
+	
 	# 从参数中初始化游戏数据
 	if param and param.has("difficulty"):
-		WorldDataManager.set_ui_temp_data(param.difficulty, param.get("seed", randi() % 0x7FFFFFFF))
+		session.set_ui_temp_data(param.difficulty, param.get("seed", randi() % 0x7FFFFFFF))
 	
 	# 检查是否有运行时地图，如果没有则从参数生成
-	if not WorldDataManager.has_runtime_map():
-		var difficulty = WorldDataManager.get_ui_temp_difficulty()
-		var seed = WorldDataManager.get_ui_temp_seed()
+	if not session.has_runtime_map():
+		var difficulty = session.get_ui_temp_difficulty()
+		var seed = session.get_ui_temp_seed()
 		if difficulty > 0 and seed > 0:
 			var map = MapGenerator.generate_map(difficulty, seed)
-			WorldDataManager.set_runtime_map(map)
+			session.set_runtime_map(map)
 
 func _init_event() -> void:
 	GlobalEventBus.event_update_by_step.connect(_on_update_step)
@@ -65,7 +69,7 @@ func _init_btns() -> void:
 			btn_map.pressed.connect(_on_click_btn_map)
 
 func _start_game() -> void:
-	_runtime_map = WorldDataManager.get_runtime_map()
+	_runtime_map = ClearRoguelikeManager.game_session.get_runtime_map() if ClearRoguelikeManager.game_session else null
 	_current_node_id = null
 	_completed_node_ids = {}
 	

@@ -89,8 +89,10 @@ func _on_click_btn_close() -> void:
 	close(false)
 
 func _on_click_btn_go() -> void:
-	# 保存数据到 WorldDataManager，供 pick_screen 读取
-	WorldDataManager.set_ui_temp_data(_selected_difficulty, _seed)
+	# 保存数据到 session，供 pick_screen 读取
+	var session = ClearRoguelikeManager.game_session
+	if session:
+		session.set_ui_temp_data(_selected_difficulty, _seed)
 	
 	# 返回 true 表示确认
 	close(true)

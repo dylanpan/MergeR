@@ -8,7 +8,11 @@ extends Node
 var _world = null
 var _game_started: bool = false
 
+# 游戏会话服务（独立于 World，用于 UI 面板间数据传递）
+var game_session: GameSessionService = null
+
 func _ready():
+	game_session = GameSessionService.new()
 	# 延迟启动游戏UI（确保 UIManager 的层级已初始化完成）
 	call_deferred("_start_game_ui")
 
@@ -38,7 +42,7 @@ func _on_difficulty_closed(confirmed: Variant) -> void:
 	
 	# 打开角色选择界面
 	var ui = UIManager.open_ui("pick_screen")
-	if ui == null:
+	if ui == nil:
 		_game_started = false
 		call_deferred("_start_game_ui")
 		return
@@ -72,7 +76,7 @@ func get_systems() -> Array:
 		return []
 	return _world.get_systems()
 
-# ==================== 服务层 API（替代旧的 Manager getters） ====================
+# ==================== 服务层 API ====================
 
 func get_game_state_service():
 	if not _world:
@@ -128,4 +132,9 @@ func destroy_world() -> void:
 		_world = null
 	
 	# 清理运行时地图
-	WorldDataManager.clear_runtime_map()
+	if game_session:
+		game_session.clear_runtime_map()
+
+func reset_session() -> void:
+	if game_session:
+		game_session.reset()
