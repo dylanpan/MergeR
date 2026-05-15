@@ -33,7 +33,7 @@ func _update_after_battle() -> int:
 	
 	var state = GameConsts.RoundState_Normal
 	
-	if not WorldDataManager.get_init_flag():
+	if not _world.game_state_service.get_init_flag():
 		return GameConsts.RoundState_GameStart
 	
 	# 步数限制检测
@@ -109,7 +109,7 @@ func _game_start() -> void:
 	_add_order_entities(game_data)
 	_add_shot_entities()
 	
-	WorldDataManager.set_init_flag(true)
+	_world.game_state_service.set_init_flag(true)
 	GlobalEventBus.event_ui_update_step.emit(_world.game_state_service.get_step_progress())
 
 func _add_element_entities(game_data) -> void:

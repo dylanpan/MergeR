@@ -23,8 +23,31 @@ var select_order_self_id: int = 0
 # 记忆的回合数据
 var _stages: Array = []
 
+var _init_flag: bool = false
+
 func _init():
 	pass
+
+# ==================== Init Flag ====================
+
+func set_init_flag(value: bool) -> void:
+	_init_flag = value
+
+func get_init_flag() -> bool:
+	return _init_flag
+
+func reset() -> void:
+	cur_game_type = 1
+	cur_level = 0
+	cur_round_idx = 0
+	round_total_step = 0
+	runtime_map = null
+	temp_ui_difficulty = 5
+	temp_ui_seed = 0
+	select_launchers.clear()
+	select_order_self_id = 0
+	_stages.clear()
+	_init_flag = false
 
 # ==================== 关卡 ====================
 
