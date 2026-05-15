@@ -10,6 +10,9 @@ class_name BaseSystem
 var _phase: int = 0
 var _priority: int = 0
 
+# World 引用（由 SystemRegistry 在注册时注入）
+var _world: World = null
+
 func _init():
 	pass
 

@@ -12,25 +12,27 @@ func dispose():
 	pass
 
 func update(dt: float) -> void:
-	var stages = WorldDataManager.get_stages()
+	if not _world:
+		return
+	var stages = _world.game_state_service.get_stages()
 	for stage in stages:
 		_do_stage(stage)
 	_update_boss_abilities(dt)
-	WorldDataManager.reset_stages()
+	_world.game_state_service.reset_stages()
 
 func _do_stage(stage: int) -> void:
 	match stage:
 		GameConsts.StageSelfBattle:
-			var order_self = WorldDataManager.get_order_self_entities()
-			var order_enermy = WorldDataManager.get_order_enermy_entities()
+			var order_self = _world.entity_service.get_order_self()
+			var order_enermy = _world.entity_service.get_order_enemy()
 			_do_battle(order_self, order_enermy, true)
 			GlobalEventBus.event_ui_update_enermy_hit.emit()
 			_reset_battle_flag(order_self)
 			GlobalEventBus.event_ui_update_self_atk.emit()
 		
 		GameConsts.StageEnermyBattle:
-			var order_self = WorldDataManager.get_order_self_entities()
-			var order_enermy = WorldDataManager.get_order_enermy_entities()
+			var order_self = _world.entity_service.get_order_self()
+			var order_enermy = _world.entity_service.get_order_enemy()
 			_do_battle(order_enermy, order_self, false)
 			GlobalEventBus.event_ui_update_self_hit.emit()
 			_reset_battle_flag(order_enermy)
@@ -106,8 +108,25 @@ func _do_hit(entity, atk: float, is_weakness: bool, is_resistance: bool) -> void
 	
 	GlobalEventBus.event_ui_update_damage.emit(entity, atk, is_weakness, is_resistance)
 	
-	if data.get("hp", 0) <= 0:
-		WorldDataManager.process_order_defeated(entity)
+	if data.get("hp", 0) <= 0 and _world:
+		_process_order_defeated(entity)
+
+func _process_order_defeated(entity) -> void:
+	if not _world:
+		return
+	var data_comp = entity.get_component(ComponentNames.DATA)
+	if not data_comp or not data_comp.data:
+		return
+	var data = data_comp.data
+	if data.get("type") == GameConsts.OrderType_Enermy and data.get("hp", 0) <= 0:
+		var order_meta = MetaConsts.get("orderEnermy", {}).get(data["id"], {})
+		var drop_items = order_meta.get("dropItems", [])
+		for drop_item in drop_items:
+			var chance = drop_item.get("chance", 0.0)
+			var item_id = drop_item.get("itemId", 0)
+			var count = drop_item.get("count", 1)
+			if randf() < chance:
+				_world.inventory_service.add_item(item_id, count)
 
 func _do_reset_step(entity) -> void:
 	var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
@@ -144,7 +163,9 @@ func _check_resistance_match(atk_elem: int, def_elem: int) -> bool:
 	return MetaConsts.elementWeakness.get(def_elem, -1) == atk_elem
 
 func _update_boss_abilities(dt: float) -> void:
-	var enermy_entities = WorldDataManager.get_order_enermy_entities()
+	if not _world:
+		return
+	var enermy_entities = _world.entity_service.get_order_enemy()
 	for boss_entity in enermy_entities:
 		var pm = boss_entity.get_component(ComponentNames.PHASE_MANAGER) as PhaseManagerComponent
 		if pm:

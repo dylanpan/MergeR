@@ -33,6 +33,8 @@ func _init():
 func create(node = null) -> void:
 	# 使用 SystemRegistry 注册所有内置系统
 	system_registry.register_builtin()
+	# 将 World 引用注入到所有已注册系统
+	system_registry.set_world(self)
 	WorldDataManager.set_world(self)
 	WorldDataManager.set_entity_manager(entity_manager)
 	BuffSystem.get_instance().init()

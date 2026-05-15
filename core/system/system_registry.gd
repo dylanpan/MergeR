@@ -19,9 +19,20 @@ var _systems: Array = []
 # 按阶段分组的系统列表
 var _systems_by_phase: Dictionary = {}
 
+# World 引用，注册时注入给每个系统
+var _world: World = null
+
 func _init():
 	for phase in Phase.values():
 		_systems_by_phase[phase] = []
+
+# ==================== 设置 ====================
+
+func set_world(world: World) -> void:
+	_world = world
+	# 有世界后推送到已注册的系统
+	for system in _systems:
+		system._world = world
 
 # ==================== 注册 ====================
 
@@ -30,6 +41,8 @@ func register(system: BaseSystem, phase: int = Phase.TICK, priority: int = 0) ->
 		return
 	system._phase = phase
 	system._priority = priority
+	if _world:
+		system._world = _world
 	_systems.append(system)
 	_systems_by_phase[phase].append(system)
 
@@ -76,4 +89,3 @@ func update_phase(phase: int, dt: float) -> void:
 	var systems = _systems_by_phase.get(phase, [])
 	for system in systems:
 		system.update(dt)
-</｜｜DSML｜｜>

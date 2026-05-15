@@ -15,7 +15,9 @@ func update(dt: float) -> void:
 	_update_order_enermy_entities()
 
 func _update_order_enermy_entities() -> void:
-	var order_enermy = WorldDataManager.get_order_enermy_entities()
+	if not _world:
+		return
+	var order_enermy = _world.entity_service.get_order_enemy()
 	for entity in order_enermy:
 		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 		if not data_comp:
@@ -32,4 +34,4 @@ func _update_order_enermy_entities() -> void:
 			else:
 				# 发起攻击
 				data["isAtker"] = 1
-				WorldDataManager.add_stage(GameConsts.StageEnermyBattle)
+				_world.game_state_service.add_stage(GameConsts.StageEnermyBattle)

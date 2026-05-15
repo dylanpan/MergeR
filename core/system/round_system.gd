@@ -28,13 +28,16 @@ func update(dt: float) -> void:
 			_game_round_over()
 
 func _update_after_battle() -> int:
+	if not _world:
+		return GameConsts.RoundState_Normal
+	
 	var state = GameConsts.RoundState_Normal
 	
 	if not WorldDataManager.get_init_flag():
 		return GameConsts.RoundState_GameStart
 	
 	# 步数限制检测
-	var step_progress = WorldDataManager.get_step_progress()
+	var step_progress = _world.game_state_service.get_step_progress()
 	if step_progress.get("max", 0) > 0 and step_progress.get("current", 0) >= step_progress.get("max", 0):
 		GlobalEventBus.event_ui_update_refresh_warning.emit({
 			"type": "step_limit",
@@ -43,7 +46,7 @@ func _update_after_battle() -> int:
 		return GameConsts.RoundState_MaxStep
 	
 	# 检测己方单位
-	var self_entities = WorldDataManager.get_order_self_entities()
+	var self_entities = _world.entity_service.get_order_self()
 	var self_finished = []
 	for entity in self_entities:
 		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
@@ -58,13 +61,13 @@ func _update_after_battle() -> int:
 				data["isPreAtker"] = 0
 	
 	for entity in self_finished:
-		WorldDataManager.remove_order_self_entity(entity)
+		_world.entity_manager.unregister_entity(entity)
 	
 	if self_finished.size() >= self_entities.size():
 		return GameConsts.RoundState_GameOver
 	
 	# 检测敌方单位
-	var enermy_entities = WorldDataManager.get_order_enermy_entities()
+	var enermy_entities = _world.entity_service.get_order_enemy()
 	var enermy_finished = []
 	for entity in enermy_entities:
 		var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
@@ -79,10 +82,10 @@ func _update_after_battle() -> int:
 				data["isPreAtker"] = 0
 	
 	for entity in enermy_finished:
-		WorldDataManager.remove_order_enermy_entity(entity)
+		_world.entity_manager.unregister_entity(entity)
 	
 	if enermy_finished.size() >= enermy_entities.size() and not enermy_entities.is_empty():
-		if WorldDataManager.is_cur_round_finish():
+		if _world.game_state_service.is_cur_round_finish():
 			return GameConsts.RoundState_LevelOver
 		else:
 			return GameConsts.RoundState_RoundOver
@@ -90,7 +93,16 @@ func _update_after_battle() -> int:
 	return state
 
 func _game_start() -> void:
-	var game_data = WorldDataManager.create_new_game_data()
+	if not _world:
+		return
+	var game_data = _world.persistence_service.create_new_game_data(
+		null,
+		_world.game_state_service.get_select_launchers(),
+		_world.game_state_service.get_selected_character_template_id(),
+		_world.game_state_service.get_cur_level(),
+		_world.game_state_service.get_cur_round_idx(),
+		_world.game_state_service.get_runtime_map()
+	)
 	_add_element_entities(game_data)
 	_add_launcher_entities(game_data)
 	_add_bullet_entities(game_data)
@@ -98,11 +110,12 @@ func _game_start() -> void:
 	_add_shot_entities()
 	
 	WorldDataManager.set_init_flag(true)
-	GlobalEventBus.event_ui_update_step.emit(WorldDataManager.get_step_progress())
+	GlobalEventBus.event_ui_update_step.emit(_world.game_state_service.get_step_progress())
 
 func _add_element_entities(game_data) -> void:
-	var wdm = WorldDataManager
-	var ui_root = wdm.get_element_ui_root()
+	if not _world:
+		return
+	var ui_root = _world.ui_root_service.get_element_ui_root()
 	if not ui_root:
 		return
 	var col = game_data.col if game_data else 7
@@ -114,11 +127,12 @@ func _add_element_entities(game_data) -> void:
 			var element_data = game_data.elements.get(key, {}) if game_data else {}
 			if not element_data.is_empty():
 				entity.init(element_data)
-			wdm.add_element_entity(entity)
+			_world.entity_manager.register_entity(entity)
 
 func _add_launcher_entities(game_data) -> void:
-	var wdm = WorldDataManager
-	var ui_root = wdm.get_launcher_ui_root()
+	if not _world:
+		return
+	var ui_root = _world.ui_root_service.get_launcher_ui_root()
 	if not ui_root:
 		return
 	var lcol = game_data.lcol if game_data else 7
@@ -132,54 +146,56 @@ func _add_launcher_entities(game_data) -> void:
 				var data_comp = entity.get_component(ComponentNames.DATA) as DataComponent
 				if data_comp:
 					data_comp.init(launcher_data)
-			wdm.add_launcher_entity(entity)
+			_world.entity_manager.register_entity(entity)
 
 func _add_bullet_entities(game_data) -> void:
-	# 简化：子弹由发射器生成
-	var wdm = WorldDataManager
-	var launchers = wdm.get_launcher_entities()
-	var element_service = null
-	if ClearRoguelikeManager.get_world():
-		element_service = ClearRoguelikeManager.get_world().element_service
+	if not _world:
+		return
+	var launchers = _world.entity_service.get_launchers()
 	for launcher in launchers:
 		var data_comp = launcher.get_component(ComponentNames.DATA) as DataComponent
 		if data_comp and not data_comp.data.is_empty():
-			var elem_data = element_service.create_element_data(data_comp.data.get("id", 0)) if element_service else {}
+			var elem_data = _world.element_service.create_element_data(data_comp.data.get("id", 0))
 			var bullet_entity = BaseEntity.new()
 			var bullet_data_comp = DataComponent.new(elem_data)
 			bullet_entity.add_component(bullet_data_comp)
-			wdm.add_bullet_entity(bullet_entity)
+			_world.entity_manager.register_entity(bullet_entity)
 
 func _add_order_entities(game_data) -> void:
-	var wdm = WorldDataManager
+	if not _world:
+		return
 	# 己方单位
 	var self_datas = game_data.orderSelf if game_data else []
 	for data in self_datas:
 		var entity = OrderSelfEntity.new(data)
-		wdm.add_order_entity(entity)
+		_world.entity_manager.register_entity(entity)
 	
 	# 敌方单位
 	var enermy_datas = game_data.orderEnermy if game_data else []
 	for data in enermy_datas:
 		var entity = OrderEnermyEntity.new(data)
-		wdm.add_order_entity(entity)
+		_world.entity_manager.register_entity(entity)
 
 func _add_shot_entities() -> void:
 	# 简化：攻击槽由 UI 层创建
 	pass
 
 func _add_new_order_enermy_entities() -> void:
-	WorldDataManager.add_round()
-	var round_meta = WorldDataManager.get_cur_round_meta()
+	if not _world:
+		return
+	_world.game_state_service.add_round()
+	var round_meta = _world.game_state_service.get_cur_round_meta()
 	if not round_meta.is_empty():
 		var enermy_datas = WorldDataManager.create_order_enermy_data(round_meta)
 		for data in enermy_datas:
 			var entity = OrderEnermyEntity.new(data)
-			WorldDataManager.add_order_entity(entity)
-	WorldDataManager.reset_round_total_step()
-	GlobalEventBus.event_ui_update_step.emit(WorldDataManager.get_step_progress())
+			_world.entity_manager.register_entity(entity)
+	_world.game_state_service.reset_round_total_step()
+	GlobalEventBus.event_ui_update_step.emit(_world.game_state_service.get_step_progress())
 
 func _game_over() -> void:
+	if not _world:
+		return
 	# 保存游戏结束前的状态
 	WorldDataManager.prepare_game_data_for_save()
 	var save_data = WorldDataManager.save_game()
@@ -193,9 +209,11 @@ func _game_over() -> void:
 	GlobalEventBus.event_update_game_over.emit()
 
 func _game_round_over() -> void:
-	WorldDataManager.to_next_level()
+	if not _world:
+		return
+	_world.game_state_service.to_next_level()
 	
-	var cur_level = WorldDataManager.get_cur_level()
+	var cur_level = _world.game_state_service.get_cur_level()
 	var level_meta = MetaConsts.get("gameLevels", {}).get(cur_level, {})
 	if level_meta.is_empty():
 		GlobalEventBus.event_round_new_level_start.emit()

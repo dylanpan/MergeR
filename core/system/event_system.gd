@@ -31,7 +31,8 @@ func open_event(event_id: int) -> bool:
 	_cur_event_entity = event_entity
 	event_entity.open()
 	
-	WorldDataManager.add_event_entity(event_entity)
+	if _world:
+		_world.entity_manager.register_entity(event_entity)
 	return true
 
 # 通过已有的实体触发事件（地图节点方式）
@@ -40,7 +41,8 @@ func trigger_event(entity) -> void:
 		return
 	var event_data = entity.on_enter() if entity.has_method("on_enter") else {}
 	_cur_event_entity = entity
-	WorldDataManager.add_event_entity(entity)
+	if _world:
+		_world.entity_manager.register_entity(entity)
 	GlobalEventBus.event_event_open.emit(entity.get_id(), event_data)
 
 # 关闭当前事件
