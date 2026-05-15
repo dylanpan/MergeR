@@ -49,6 +49,18 @@ func create(node = null) -> void:
 func get_systems() -> Array:
 	return system_registry.get_all()
 
+# ==================== 主循环（基于 Phase 编排） ====================
+
+func tick(dt: float = 0.0) -> void:
+	"""
+	游戏主循环，按 Phase 顺序执行所有系统。
+	替代 roguelike_screen 中直接遍历 get_systems() 的方式。
+	"""
+	system_registry.update_phase(SystemRegistry.Phase.PRE_BATTLE, dt)
+	system_registry.update_phase(SystemRegistry.Phase.BATTLE, dt)
+	system_registry.update_phase(SystemRegistry.Phase.POST_BATTLE, dt)
+	system_registry.update_phase(SystemRegistry.Phase.CLEANUP, dt)
+
 # ==================== 便捷查询 API ====================
 
 func query() -> EntityQuery:

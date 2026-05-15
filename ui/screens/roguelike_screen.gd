@@ -86,9 +86,15 @@ func _start_game() -> void:
 			_on_update_step()
 
 func _on_update_step() -> void:
-	var systems = ClearRoguelikeManager.get_systems()
-	for system in systems:
-		system.update(0.0)
+	# 使用 World.tick() 按 Phase 编排执行所有系统
+	var world = ClearRoguelikeManager.get_world()
+	if world and world.has_method("tick"):
+		world.tick(0.0)
+	else:
+		# 回退：直接遍历系统
+		var systems = ClearRoguelikeManager.get_systems()
+		for system in systems:
+			system.update(0.0)
 
 func _on_game_over() -> void:
 	ClearRoguelikeManager.destroy_world()
