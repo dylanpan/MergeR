@@ -197,8 +197,11 @@ func _game_over() -> void:
 	if not _world:
 		return
 	# 保存游戏结束前的状态
-	WorldDataManager.prepare_game_data_for_save()
-	var save_data = WorldDataManager.save_game()
+	var save_data = _world.persistence_service.save_game_with_services(
+		_world.game_state_service,
+		_world.inventory_service,
+		_world.entity_manager
+	)
 	if not save_data.is_empty():
 		var json = JSON.stringify(save_data)
 		if not json.is_empty():

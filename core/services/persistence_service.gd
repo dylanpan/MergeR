@@ -128,5 +128,45 @@ func get_all_self_datas() -> Array:
 		return []
 	return _game_data.orderSelf.duplicate()
 
+# ==================== 存档数据协调（原 WorldDataManager.save_game_to_data） ====================
+
+func prepare_game_data_for_save(entity_manager) -> void:
+	"""
+	将实体数据同步到存档数据（在保存前调用）
+	"""
+	if not _game_data or not entity_manager:
+		return
+	var all_types = [
+		entity_manager.get_by_type(3),  # ELEMENT
+		entity_manager.get_by_type(4),  # LAUNCHER
+		entity_manager.get_by_type(5),  # BULLET
+		entity_manager.get_by_type(6),  # SHOT
+		entity_manager.get_by_type(1),  # ORDER_SELF
+		entity_manager.get_by_type(2),  # ORDER_ENEMY
+	]
+	for list in all_types:
+		for entity in list:
+			if entity and entity.has_method("sync_to_data"):
+				entity.sync_to_data()
+			elif entity and entity.has_method("get_component"):
+				var data_comp = entity.get_component(ComponentNames.DATA)
+				var buff_comp = entity.get_component(ComponentNames.BUFF)
+				if data_comp and data_comp.data and buff_comp and buff_comp.has_method("to_json"):
+					data_comp.data["buffs"] = buff_comp.to_json()
+
+func save_game_with_services(game_state_service, inventory_service, entity_manager) -> Dictionary:
+	"""
+	保存游戏：先同步实体数据到存档，再序列化
+	等价于 WorldDataManager.save_game()
+	"""
+	if not _game_data:
+		return {}
+	prepare_game_data_for_save(entity_manager)
+	_game_data.level = game_state_service.get_cur_level()
+	_game_data.round = game_state_service.get_cur_round_idx()
+	_game_data.items = inventory_service.get_all_items()
+	_game_data.currencies = inventory_service.get_all_currencies()
+	return _game_data.to_json()
+
 func reset() -> void:
 	_game_data = null

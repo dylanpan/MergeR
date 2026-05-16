@@ -35,14 +35,13 @@ func _start_game_ui():
 
 func _on_difficulty_closed(confirmed: Variant) -> void:
 	if not confirmed:
-		# 用户关闭了界面，重新打开
 		_game_started = false
 		call_deferred("_start_game_ui")
 		return
 	
 	# 打开角色选择界面
 	var ui = UIManager.open_ui("pick_screen")
-	if ui == nil:
+	if ui == null:
 		_game_started = false
 		call_deferred("_start_game_ui")
 		return
@@ -103,26 +102,20 @@ func get_entity_service():
 		return null
 	return _world.entity_service
 
-func get_save_game_data() -> Dictionary:
-	var wdm = WorldDataManager
-	wdm.prepare_game_data_for_save()
-	return wdm.get_cur_game_data()
-
-func get_save_game_json() -> String:
-	var data = get_save_game_data()
-	var json = JSON.stringify(data)
-	if json.is_empty():
-		return ""
-	return json
-
 func destroy_world() -> void:
 	if _world:
 		# 先保存当前游戏状态
-		var save_json = get_save_game_json()
-		if not save_json.is_empty():
-			var config = ConfigFile.new()
-			config.set_value("save", "clear_roguelike_last", save_json)
-			config.save("user://clear_roguelike_save.cfg")
+		var save_data = _world.persistence_service.save_game_with_services(
+			_world.game_state_service,
+			_world.inventory_service,
+			_world.entity_manager
+		)
+		if not save_data.is_empty():
+			var json = JSON.stringify(save_data)
+			if not json.is_empty():
+				var config = ConfigFile.new()
+				config.set_value("save", "clear_roguelike_last", json)
+				config.save("user://clear_roguelike_save.cfg")
 		
 		_world.destroy()
 		# 从场景树移除并释放

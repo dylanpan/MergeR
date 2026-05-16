@@ -35,8 +35,7 @@ func create(node = null) -> void:
 	system_registry.register_builtin()
 	# 将 World 引用注入到所有已注册系统
 	system_registry.set_world(self)
-	WorldDataManager.set_world(self)
-	WorldDataManager.set_entity_manager(entity_manager)
+	# 初始化 Buff 系统
 	BuffSystem.get_instance().init()
 	
 	if node:
