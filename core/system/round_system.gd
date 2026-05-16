@@ -186,7 +186,7 @@ func _add_new_order_enermy_entities() -> void:
 	_world.game_state_service.add_round()
 	var round_meta = _world.game_state_service.get_cur_round_meta()
 	if not round_meta.is_empty():
-		var enermy_datas = WorldDataManager.create_order_enermy_data(round_meta)
+		var enermy_datas = EnemyFactory.create_order_enermy_data(round_meta, null, _world.game_state_service.get_cur_round_idx())
 		for data in enermy_datas:
 			var entity = OrderEnermyEntity.new(data)
 			_world.entity_manager.register_entity(entity)

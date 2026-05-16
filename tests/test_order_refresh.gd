@@ -10,8 +10,8 @@ func test_create_order_enermy():
 		"step": 20,
 		"orderEnermyPool": [30001, 30002],
 	}
-	var enermy_datas = WorldDataManager.create_order_enermy_data(round_meta)
-	assert_gt(enermy_datas.size(), 0, "应生成敌方单位数据")
+		var enermy_datas = EnemyFactory.create_order_enermy_data(round_meta, null, 0)
+		assert_gt(enermy_datas.size(), 0, "应生成敌方单位数据")
 
 func test_order_entity_hp():
 	var data = {"id": 30001, "hp": 50, "def": 2, "atk": 10, "step": 5, "type": 2, "isAtker": 0, "bullets": []}
