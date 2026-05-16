@@ -81,4 +81,5 @@ func destroy() -> void:
 	inventory_service.reset()
 	persistence_service.reset()
 	ui_root_service.reset()
-	WorldDataManager.set_init_flag(false)
+	if ClearRoguelikeManager.game_session:
+		ClearRoguelikeManager.game_session.set_init_flag(false)
