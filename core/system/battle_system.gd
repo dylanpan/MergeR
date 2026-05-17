@@ -26,17 +26,17 @@ func _do_stage(stage: int) -> void:
 			var order_self = _world.entity_service.get_order_self()
 			var order_enermy = _world.entity_service.get_order_enemy()
 			_do_battle(order_self, order_enermy, true)
-			GlobalEventBus.event_ui_update_enermy_hit.emit()
+			GlobalEventBus.event_battle_update.emit({"type": "enemy_hit"})
 			_reset_battle_flag(order_self)
-			GlobalEventBus.event_ui_update_self_atk.emit()
+			GlobalEventBus.event_battle_update.emit({"type": "self_atk"})
 		
 		GameConsts.StageEnermyBattle:
 			var order_self = _world.entity_service.get_order_self()
 			var order_enermy = _world.entity_service.get_order_enemy()
 			_do_battle(order_enermy, order_self, false)
-			GlobalEventBus.event_ui_update_self_hit.emit()
+			GlobalEventBus.event_battle_update.emit({"type": "self_hit"})
 			_reset_battle_flag(order_enermy)
-			GlobalEventBus.event_ui_update_enermy_atk.emit()
+			GlobalEventBus.event_battle_update.emit({"type": "enemy_atk"})
 
 func _do_battle(atk_entities: Array, def_entities: Array, is_left: bool = true) -> void:
 	for atk_entity in atk_entities:
@@ -106,7 +106,13 @@ func _do_hit(entity, atk: float, is_weakness: bool, is_resistance: bool) -> void
 	var data = data_comp.data
 	data["hp"] = data.get("hp", 0) - atk
 	
-	GlobalEventBus.event_ui_update_damage.emit(entity, atk, is_weakness, is_resistance)
+	GlobalEventBus.event_battle_update.emit({
+		"type": "damage",
+		"entity": entity,
+		"damage": atk,
+		"is_weakness": is_weakness,
+		"is_resistance": is_resistance
+	})
 	
 	if data.get("hp", 0) <= 0 and _world:
 		_process_order_defeated(entity)

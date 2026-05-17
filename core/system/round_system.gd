@@ -209,7 +209,7 @@ func _game_over() -> void:
 			config.set_value("save", "clear_roguelike_last", json)
 			config.save("user://clear_roguelike_save.cfg")
 	
-	GlobalEventBus.event_update_game_over.emit()
+	GlobalEventBus.event_game_state.emit({"type": "over"})
 
 func _game_round_over() -> void:
 	if not _world:
@@ -219,7 +219,7 @@ func _game_round_over() -> void:
 	var cur_level = _world.game_state_service.get_cur_level()
 	var level_meta = MetaConsts.get("gameLevels", {}).get(cur_level, {})
 	if level_meta.is_empty():
-		GlobalEventBus.event_round_new_level_start.emit()
+		GlobalEventBus.event_round_update.emit({"type": "new_level"})
 		return
 	
 	# 检查商店配置
@@ -248,6 +248,6 @@ func _game_round_over() -> void:
 		-1:
 			pass
 		-2:
-			GlobalEventBus.event_update_game_win.emit()
+			GlobalEventBus.event_game_state.emit({"type": "win"})
 		_:
-			GlobalEventBus.event_round_new_level_start.emit()
+			GlobalEventBus.event_round_update.emit({"type": "new_level"})
