@@ -6,7 +6,7 @@ class_name RoguelikeScreen
 
 var _runtime_map = null
 var _current_node_id = null
-var _completed_node_ids: Dictionary = {}  # Set simulated with Dictionary
+var _completed_node_ids: Dictionary = {}
 var _map_preview: UIBase = null
 
 func _ready() -> void:
@@ -25,6 +25,8 @@ func on_closed() -> void:
 		GlobalEventBus.event_update_game_over.disconnect(_on_game_over)
 	if GlobalEventBus.event_update_game_win.is_connected(_on_game_win):
 		GlobalEventBus.event_update_game_win.disconnect(_on_game_win)
+	if GlobalEventBus.event_game_state.is_connected(_on_game_state_update):
+		GlobalEventBus.event_game_state.disconnect(_on_game_state_update)
 	
 	ClearRoguelikeManager.destroy_world()
 
@@ -33,11 +35,9 @@ func _init_data(param: Dictionary = {}) -> void:
 	if not session:
 		return
 	
-	# 从参数中初始化游戏数据
 	if param and param.has("difficulty"):
 		session.set_ui_temp_data(param.difficulty, param.get("seed", randi() % 0x7FFFFFFF))
 	
-	# 检查是否有运行时地图，如果没有则从参数生成
 	if not session.has_runtime_map():
 		var difficulty = session.get_ui_temp_difficulty()
 		var seed = session.get_ui_temp_seed()
@@ -47,8 +47,11 @@ func _init_data(param: Dictionary = {}) -> void:
 
 func _init_event() -> void:
 	GlobalEventBus.event_update_by_step.connect(_on_update_step)
+	# 旧信号（向后兼容）
 	GlobalEventBus.event_update_game_over.connect(_on_game_over)
 	GlobalEventBus.event_update_game_win.connect(_on_game_win)
+	# 新通用信号
+	GlobalEventBus.event_game_state.connect(_on_game_state_update)
 
 func _init_ui() -> void:
 	_init_event()
@@ -73,32 +76,35 @@ func _start_game() -> void:
 	_current_node_id = null
 	_completed_node_ids = {}
 	
-	# 通过 UIManager 打开地图预览（作为弹出层）
 	_map_preview = UIManager.open_ui("map_preview", {
 		"current_node_id": _current_node_id,
 		"completed_node_ids": _completed_node_ids
 	})
 	
-	# 直接进入第一层第一个节点
 	if _runtime_map and _runtime_map.layers.size() > 0:
 		var first_node = _runtime_map.layers[0]
 		if first_node:
 			_current_node_id = first_node.get("id", null)
-			# 传入 UI 节点容器（从场景中获取 nodeDialog）
 			var ui_container = get_node("nodeDialog") if has_node("nodeDialog") else self
 			ClearRoguelikeManager.create_world(ui_container)
 			_on_update_step()
 
 func _on_update_step() -> void:
-	# 使用 World.tick() 按 Phase 编排执行所有系统
 	var world = ClearRoguelikeManager.get_world()
 	if world and world.has_method("tick"):
 		world.tick(0.0)
 	else:
-		# 回退：直接遍历系统
 		var systems = ClearRoguelikeManager.get_systems()
 		for system in systems:
 			system.update(0.0)
+
+func _on_game_state_update(data: Dictionary) -> void:
+	var type = data.get("type", "")
+	match type:
+		"over":
+			_on_game_over()
+		"win":
+			_on_game_win()
 
 func _on_game_over() -> void:
 	ClearRoguelikeManager.destroy_world()
@@ -130,7 +136,6 @@ func _on_game_win() -> void:
 	_close_to_pick()
 
 func _close_to_pick() -> void:
-	# 回到难度选择（不需要 callback，difficulty_select 不再使用 callback 参数）
 	UIManager.open_ui("difficulty_select")
 	close()
 
@@ -139,7 +144,6 @@ func _on_click_btn_back() -> void:
 	close()
 
 func _on_click_btn_map() -> void:
-	# 通过 UIManager 打开地图预览
 	UIManager.open_ui("map_preview", {
 		"current_node_id": _current_node_id,
 		"completed_node_ids": _completed_node_ids

@@ -27,6 +27,7 @@ func dispose() -> void:
 
 func _init_event() -> void:
 	GlobalEventBus.event_update_game_over.connect(_on_game_over)
+	GlobalEventBus.event_game_state.connect(_on_game_state)
 
 func _init_ui() -> void:
 	_init_health_bar()
@@ -56,6 +57,10 @@ func _init_element_display() -> void:
 func _init_skill_display() -> void:
 	if has_node("skillDisplay"):
 		get_node("skillDisplay").visible = true
+
+func _on_game_state(data: Dictionary) -> void:
+	if data.get("type", "") == "over":
+		_on_game_over()
 
 func _on_game_over() -> void:
 	# 游戏结束时隐藏Boss UI

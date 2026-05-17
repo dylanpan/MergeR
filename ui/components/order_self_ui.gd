@@ -2,11 +2,6 @@ extends Control
 class_name OrderSelfUI
 
 # 己方单位UI（替代 OrderSelfUI.js）
-# 管理己方单位的角色图片、血量、子弹、弱点显示
-# 使用方式：
-#   var ui = preload("res://ui/components/order_self_ui.tscn").instantiate()
-#   parent.add_child(ui)
-#   ui.setup(entity)
 
 var entity
 var _on_click_handler: Callable
@@ -23,9 +18,22 @@ func dispose() -> void:
 	queue_free()
 
 func _init_event() -> void:
+	# 旧信号（向后兼容）
 	GlobalEventBus.event_ui_update_order_self.connect(_on_update_bullet)
 	GlobalEventBus.event_ui_update_self_atk.connect(_on_update_bullet)
 	GlobalEventBus.event_ui_update_self_hit.connect(_on_update_hp)
+	# 新通用信号
+	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_battle_update(data: Dictionary) -> void:
+	var type = data.get("type", "")
+	match type:
+		"damage":
+			_on_update_hp()
+		"self_hit", "self_atk":
+			_on_update_bullet()
+		"enemy_hit", "enemy_atk":
+			pass  # 对方的动作不影响本方
 
 func _on_update_bullet() -> void:
 	_init_bullet()

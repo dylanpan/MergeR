@@ -2,11 +2,6 @@ extends Control
 class_name OrderEnermyUI
 
 # 敌方单位UI（替代 OrderEnermyUI.js）
-# 管理敌方单位的角色图片、血量、步数、子弹、弱点显示
-# 使用方式：
-#   var ui = preload("res://ui/components/order_enermy_ui.tscn").instantiate()
-#   parent.add_child(ui)
-#   ui.setup(entity)
 
 var entity
 
@@ -19,12 +14,25 @@ func dispose() -> void:
 	queue_free()
 
 func _init_event() -> void:
+	# 旧信号（向后兼容）
 	GlobalEventBus.event_ui_update_enermy_atk.connect(_on_update_bullet)
 	GlobalEventBus.event_ui_update_enermy_hit.connect(_on_update_hp)
 	GlobalEventBus.event_update_by_step.connect(_on_update_step)
 	GlobalEventBus.event_ui_update_enermy_reload.connect(_on_update_bullet)
 	GlobalEventBus.event_ui_update_step.connect(_on_update_step_display)
 	GlobalEventBus.event_ui_update_refresh_warning.connect(_on_show_refresh_warning)
+	# 新通用信号
+	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_battle_update(data: Dictionary) -> void:
+	var type = data.get("type", "")
+	match type:
+		"damage":
+			_on_update_hp()
+		"reload", "enemy_hit", "enemy_atk":
+			_on_update_bullet()
+		"self_hit", "self_atk":
+			pass  # 对方的动作不会影响本方的显示
 
 func _on_update_bullet() -> void:
 	_init_bullet()
@@ -64,7 +72,6 @@ func _init_role() -> void:
 		var role_id = meta.get("role", 1)
 		var level = meta.get("level", 1)
 		
-		# 根据等级选择背景
 		var bg_idx = 2
 		if level <= 5:
 			bg_idx = 2
@@ -122,10 +129,10 @@ func _update_weakness_item(item, data) -> void:
 		item.set_element_type(element_type)
 	
 	var weakness_map = {
-		1: Color(1, 0.3, 0.3), # 火 -> 红
-		2: Color(0.3, 0.5, 1), # 水 -> 蓝
-		3: Color(0.3, 1, 0.3), # 风 -> 绿
-		4: Color(0.8, 0.6, 0.3), # 土 -> 棕
+		1: Color(1, 0.3, 0.3),
+		2: Color(0.3, 0.5, 1),
+		3: Color(0.3, 1, 0.3),
+		4: Color(0.8, 0.6, 0.3),
 	}
 	var color = weakness_map.get(element_type, Color(0.8, 0.8, 0.8))
 	if item is TextureRect:
