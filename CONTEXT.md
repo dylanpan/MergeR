@@ -7,7 +7,8 @@
 | **World** | 游戏世界核心，ECS 架构中的世界容器，负责系统注册与主循环 |
 | **Entity** | 实体，ECS 中的基本对象，由多个 Component 组成 |
 | **Component** | 组件，纯数据结构，承载实体的属性（位置、血量、技能等） |
-| **System** | 系统，处理游戏逻辑，每帧/每回合对匹配的实体进行操作 |
+| **System** | 系统，处理游戏逻辑，通过 `_world` 引用访问服务层 |
+| **Service** | 服务，封装领域逻辑，由 World 实例化并注入给系统 |
 | **Buff** | 增益/减益效果，可叠加、可计时，影响实体属性或行为 |
 | **Skill** | 技能，实体的主动能力，可在战斗中释放 |
 | **Round** | 回合，游戏的最小进度单位，每回合推进事件链 |
@@ -29,10 +30,29 @@
 | 术语 | 说明 |
 |------|------|
 | **ECS** | Entity-Component-System 架构模式，数据与行为分离 |
-| **UIManager** | 分层 UI 管理系统，支持 5 层 CanvasLayer 渲染 |
+| **World** | 核心枢纽，管理所有 System、Service、EntityManager。已加入场景树 |
+| **Service 层** | 6 个领域服务：game_state, inventory, persistence, ui_root, entity, element |
+| **SystemRegistry** | 系统注册表，按 Phase（PRE_BATTLE→BATTLE→POST_BATTLE→CLEANUP）编排执行 |
+| **World.tick()** | 主循环入口，替代直接遍历系统列表的方式 |
 | **GlobalEventBus** | 全局事件总线，模块间解耦通信 |
-| **WorldDataManager** | 世界数据管理，负责存档读写 |
-| **ClearRoguelikeManager** | 游戏主流程编排管理器 |
+| **GameSessionService** | 独立于 World 的会话服务，用于 UI 面板间数据传输（难度选择→角色选择→主游戏） |
+| **EnemyFactory** | 敌人生成工厂，根据回合配置生成敌方单位 |
+| **UIManager** | 分层 UI 管理系统，支持 5 层 CanvasLayer 渲染 |
+| **ClearRoguelikeManager** | 游戏主流程编排管理器，持有 game_session 引用 |
+
+## 架构演进（从上帝类到服务化）
+
+```
+v1 (原始): WorldDataManager (817 行上帝类)
+  ├── 所有系统直接调用 WorldDataManager.xxx()
+  └── 所有 UI 面板通过 WorldDataManager 传递数据
+
+v2 (当前): 服务化 ECS 架构
+  ├── core/services/     → 8 个专注服务
+  ├── core/system/       → 通过 _world.service.xxx 访问
+  ├── World.tick()       → Phase 编排主循环
+  └── GameSessionService → UI 面板数据总线
+```
 
 ## ADR（架构决策记录）
 
