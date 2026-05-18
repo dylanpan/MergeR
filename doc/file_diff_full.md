@@ -2865,3 +2865,65 @@ GD 攻击流程：
 **ShotElementEntity 控制了整个攻击流程的核心逻辑 _clickEntityData()，删除它意味着玩家无法发起任何攻击。**
 
 ---
+
+## **BaseSkill.js 迁移对比分析**
+
+### 📋 **文件信息**
+| 项目 | JS版本 | GD版本 | 行数差异 |
+|------|--------|--------|---------|
+| **文件路径** | clearRoguelike/base/skills/BaseSkill.js | gdRoguelike/core/skills/base_skill.gd | 65行 vs 52行 |
+| **迁移完整度** | ✅ **70% 迁移** | ✅ 基础功能完整 | **事件系统改变** |
+
+### 核心差异与对标
+
+| JS 实现 | GD 实现 | 差异说明 | 影响评估 |
+|--------|--------|---------|---------|
+| **constructor(skillData)** (L9-15) | **_init(p_skill_data)** (L14-15) | 初始化逻辑一致 | ✅ 一致 |
+| **skillData/entityId/isActive** (L10-12) | **同名变量** (L10-12) | 属性定义完全对应 | ✅ 一致 |
+| **_registerEventListener()** (L21-23) | **_register_event_listener()** (L27-28) | 命名转换，都是虚方法 | ✅ 一致 |
+| **onEvent(event, args)** (L28-32) | **on_event(event_name, args)** (L31-34) | 参数差异：event vs event_name | ⚠️ 参数变化 |
+| **execute(context)** (L38-41) | **execute(context)** (L17-18) | 日志调用改为推送错误，功能简化 | ✅ 改进：去除日志 |
+| **onExecute(context)虚方法** (L47-49) | **on_execute(context)虚方法** (L20-21) | 错误处理改为push_error | ✅ 改进 |
+| **bindEntity(entityId)** (L54-56) | **bind_entity(p_entity_id)** (L23-24) | 命名转换，功能一致 | ✅ 一致 |
+| **dispose()方法** (L61-64) | **dispose()方法** (L47-52) | GD版本尝试断开所有连接 | ⚠️ 差异 |
+| **新增方法** | **connect_to_bus(signal_name)** (L37-39) | GD新增，连接到GlobalEventBus | ✅ 增强 |
+| **新增方法** | **_on_bus_event(args, signal_name)** (L42-45) | GD新增，总线事件适配器 | ✅ 增强 |
+| **EventManager.unregisterAll()** (L63) | **使用GlobalEventBus** | 事件系统架构完全不同 | ⚠️ **架构变更** |
+
+### 🔍 **关键架构差异**
+
+| 方面 | JS版本 | GD版本 | 影响 |
+|------|--------|--------|------|
+| **事件系统** | EventManager.register/unregister | GlobalEventBus 信号连接 | ⚠️ 完全不同的事件模式 |
+| **事件监听方式** | 子类重写_registerEventListener()并调用register | 子类调用connect_to_bus()连接信号 | ⚠️ 大幅改变 |
+| **事件处理流程** | EventManager主动调用onEvent | GlobalEventBus信号驱动调用_on_bus_event | ⚠️ 被动→主动模式 |
+| **dispose处理** | 简单unregisterAll | 尝试中止树内连接 | ⚠️ 处理复杂化 |
+
+### ⚠️ **缺失/变化的功能**
+
+| 序号 | 功能 | JS实现 | GD实现 | 影响 |
+|------|------|--------|--------|------|
+| 1 | **_registerEventListener()调用** | constructor中调用 | 没有自动调用，需子类手动调用connect_to_bus() | ⚠️ 初始化流程改变 |
+| 2 | **EventManager依赖** | 导入EventManager使用 | 不需要，使用GlobalEventBus | ✅ 改进：解耦 |
+| 3 | **日志记录** | execute中有日志 | 删除日志 | ✅ 改进：性能 |
+| 4 | **事件参数验证** | onEvent中检查entityId | on_event和_on_bus_event中双重检查 | ⚠️ 重复验证 |
+| 5 | **disconnect处理** | 不存在 | dispose中处理树内连接断开 | ⚠️ 新增复杂逻辑 |
+
+### 📊 **迁移评估**
+
+| 维度 | 评分 | 说明 |
+|------|------|------|
+| 功能完整性 | ✅ 80% | 核心方法都有，初始化方式改变 |
+| 事件系统兼容性 | ⚠️ 差 | 从EventManager→GlobalEventBus，子类需要适配 |
+| 事件处理正确性 | ⚠️ 部分 | 双重检查entityId可能造成冗余 |
+| dispose完整性 | ⚠️ 部分 | GD版本处理复杂但可能不完整 |
+| **总体结论** | ⚠️ **70% 迁移** | 核心骨架完整，但事件系统架构完全改变，**子类实现需大幅调整** |
+
+### 🔴 **关键问题**
+
+1. **事件系统完全改架** - JS的EventManager → GD的GlobalEventBus，这是根本性的架构变更
+2. **子类初始化流程改变** - JS自动调用_registerEventListener() → GD需手动调用connect_to_bus()
+3. **_on_bus_event适配器引入复杂性** - 需要处理args可能是Dictionary或其他类型的情况
+4. **子类实现必须改变** - 所有技能子类都需要重写事件连接逻辑
+
+---
