@@ -3,6 +3,7 @@ extends BaseSystem
 # ============================================================
 # 事件系统（替代 EventSystem.js）
 # 管理地图节点上的随机事件：创建、生命周期和调度
+# 使用 BaseEventEntity 新生命周期框架
 # ============================================================
 
 var _cur_event_entity = null
@@ -51,10 +52,19 @@ func close_current_event() -> void:
 		_cur_event_entity.close()
 		_cur_event_entity = null
 
-# 处理用户选项选择
+# 处理用户选项选择（使用 BaseEventEntity.select_option 返回布尔值）
 func resolve_option(entity, option_id: int) -> void:
-	if entity and entity.has_method("on_option_select"):
-		var result = entity.on_option_select(option_id)
-		if result:
-			_cur_event_entity = null
+	if not entity:
+		return
+	
+	var result = false
+	# 优先使用新生命周期方法 select_option（返回 bool）
+	if entity.has_method("select_option"):
+		result = entity.select_option(option_id)
+	elif entity.has_method("on_option_select"):
+		entity.on_option_select(option_id)
+		result = true
+	
+	if result:
+		_cur_event_entity = null
 	GlobalEventBus.event_event_close.emit()

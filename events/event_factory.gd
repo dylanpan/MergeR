@@ -2,7 +2,7 @@ extends Node
 
 # ============================================================
 # 事件工厂类（替代 EventFactory.js）
-# 负责根据事件ID创建对应的事件实体实例
+# 负责根据事件ID创建对应的事件实体实例，并注入元数据配置
 # ============================================================
 
 # 注册表：存储事件ID到构造函数的映射
@@ -14,16 +14,26 @@ static func _static_init() -> void:
 	_event_registry[70002] = func(id): return HealFountainEvent.new(id)
 	_event_registry[70003] = func(id): return RandomBuffEvent.new(id)
 
-static func create_event_entity(event_id: int) -> BaseEventEntity:
+static func create_event_entity(event_id: int, meta: Dictionary = {}) -> BaseEventEntity:
 	if _event_registry.is_empty():
 		_static_init()
 	
 	var factory = _event_registry.get(event_id, null)
-	if factory:
-		return factory.call(event_id)
+	if not factory:
+		push_warning("EventFactory: 未注册的事件ID " + str(event_id))
+		return null
 	
-	push_warning("EventFactory: 未注册的事件ID " + str(event_id))
-	return null
+	var entity = factory.call(event_id) as BaseEventEntity
+	if not entity:
+		push_error("EventFactory: 创建事件实体失败 ID=" + str(event_id))
+		return null
+	
+	# 注入元数据配置：若未提供 meta，从 MetaConsts 自动读取
+	if meta.is_empty() and MetaConsts.has("gameEvents"):
+		meta = MetaConsts.get("gameEvents", {}).get(event_id, {})
+	
+	entity.init(meta)
+	return entity
 
 static func register_event_entity(event_id: int, class_ref) -> void:
 	# 通过类引用的 new 方法动态创建实例

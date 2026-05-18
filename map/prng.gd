@@ -24,3 +24,36 @@ func next_float() -> float:
 
 func next_int(min_val: int, max_val: int) -> int:
 	return min_val + int(next_float() * (max_val - min_val + 1))
+
+func random_choice(array: Array):
+	if array.is_empty():
+		return null
+	return array[next_int(0, array.size() - 1)]
+
+func weighted_random_choice(items: Array, weights: Array):
+	if items.is_empty() or weights.is_empty():
+		return null
+	if items.size() != weights.size():
+		return null
+	
+	var total_weight = 0.0
+	for w in weights:
+		total_weight += w
+	
+	var roll = next_float() * total_weight
+	
+	for i in range(items.size()):
+		roll -= weights[i]
+		if roll <= 0:
+			return items[i]
+	
+	return items[-1]
+
+func shuffle(array: Array) -> Array:
+	var result = array.duplicate()
+	for i in range(result.size() - 1, 0, -1):
+		var j = next_int(0, i)
+		var temp = result[i]
+		result[i] = result[j]
+		result[j] = temp
+	return result

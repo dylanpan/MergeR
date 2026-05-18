@@ -2,6 +2,7 @@ extends BaseEntity
 
 # ============================================================
 # 己方单位实体（替代 OrderSelfEntity.js）
+# 支持数据初始化、BuffId配置、UI显示与点击交互
 # ============================================================
 
 class_name OrderSelfEntity
@@ -15,6 +16,28 @@ func _init(data: Dictionary = {}):
 	
 	var buff_comp = BuffComponent.new()
 	add_component(buff_comp)
+
+func init(data: Dictionary) -> void:
+	"""初始化角色数据，包括配置中的BuffId"""
+	var data_comp = get_component(ComponentNames.DATA) as DataComponent
+	if not data_comp or data.is_empty():
+		return
+	
+	data_comp.init(data)
+	
+	# 初始化配置中的BuffId
+	var buff_id = data.get("buffId", 0)
+	if buff_id:
+		var buff_data = MetaConsts.buffs.get(buff_id, {})
+		if not buff_data.is_empty():
+			var buff_comp = get_component(ComponentNames.BUFF) as BuffComponent
+			if buff_comp:
+				buff_comp.add_buff({
+					"type": buff_data.get("type", ""),
+					"value": buff_data.get("value", 0),
+					"duration": -1,
+					"source": "order_self_config"
+				})
 
 func get_hp() -> int:
 	var data_comp = get_component(ComponentNames.DATA) as DataComponent

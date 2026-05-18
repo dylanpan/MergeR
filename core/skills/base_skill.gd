@@ -46,7 +46,8 @@ func _on_bus_event(args, signal_name: String) -> void:
 
 func dispose() -> void:
 	is_active = false
-	# GlobalEventBus 的连接断开由系统自动管理，但我们可以断开所有连接
+	# 若在场景树内则断开所有连接
 	if is_inside_tree():
-		for connection in get_all_connections():
+		var connections = get_all_connections()
+		for connection in connections:
 			disconnect(connection.signal, connection.callable)

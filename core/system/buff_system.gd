@@ -198,6 +198,10 @@ func trigger_timing(timing: int, context: BuffContext = null) -> void:
 					buffs_to_trigger.append(buff)
 		
 		for buff in buffs_to_trigger:
+			# 短路检查：若上下文已被取消，则跳过后续 Buff
+			if context.is_cancelled():
+				break
+			
 			match timing:
 				BuffTriggerTiming.ON_APPLY:
 					buff.apply(context)
