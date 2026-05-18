@@ -19,7 +19,7 @@ static func create_rest_entity(rest_id: int, meta: Dictionary = {}) -> BaseRestE
 	
 	# 注入元数据配置：若未提供 meta，从 MetaConsts 自动读取
 	if meta.is_empty() and MetaConsts.has("gameRests"):
-		meta = MetaConsts.get("gameRests", {}).get(rest_id, {})
+		meta = MetaConsts.gameRests.get(rest_id, {})
 	
 	entity.init(meta)
 	return entity

@@ -60,7 +60,7 @@ func get_selected_character_template_id() -> int:
 func get_selected_character_template() -> Dictionary:
 	if not select_order_self_id:
 		return {}
-	return MetaConsts.get("orderSelf", {}).get(select_order_self_id, {})
+	return MetaConsts.orderSelf.get(select_order_self_id, {})
 
 # ==================== 运行时地图 ====================
 

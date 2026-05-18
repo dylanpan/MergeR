@@ -57,7 +57,7 @@ func _init_role() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.get("orderSelf", {}).get(data.get("id", 0), {})
+		var meta = MetaConsts.orderSelf.get(data.get("id", 0), {})
 		var role_id = meta.get("role", 1)
 		var texture_path = "res://assets/roles/order_role_" + str(role_id) + ".png"
 		node_order.get_node("spRole").texture = load(texture_path)
@@ -71,7 +71,7 @@ func _init_hp() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.get("orderSelf", {}).get(data.get("id", 0), {})
+		var meta = MetaConsts.orderSelf.get(data.get("id", 0), {})
 		var hp_text = str(data.get("hp", 0)) + "/" + str(meta.get("hp", 0))
 		node_order.get_node("lbHp").text = hp_text
 

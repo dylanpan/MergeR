@@ -21,7 +21,7 @@ func on_execute(context: Dictionary) -> void:
 	
 	for i in range(count):
 		# 获取小怪配置
-		var enermy_meta = MetaConsts.get("orderEnermy", {}).get(minion_id, MetaConsts.get("orderEnermy", {}).get(30001, {}))
+		var enermy_meta = MetaConsts.orderEnermy.get(minion_id, MetaConsts.orderEnermy.get(30001, {}))
 		if enermy_meta.is_empty():
 			continue
 		

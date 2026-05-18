@@ -22,6 +22,8 @@ config/icon="res://icon.svg"
 GlobalEventBus="*res://autoload/global_event_bus.gd"
 ClearRoguelikeManager="*res://autoload/clear_roguelike_manager.gd"
 UIManager="*res://autoload/ui_manager.gd"
+MetaConsts="*res://data/meta_consts.gd"
+GameConsts="*res://data/game_consts.gd"
 
 [display]
 

@@ -34,12 +34,12 @@ func on_closed() -> void:
 
 func _init_data() -> void:
 	_launchers = []
-	var launcher_dict = MetaConsts.get("launchers", {})
+	var launcher_dict = MetaConsts.launchers
 	for key in launcher_dict:
 		_launchers.append(launcher_dict[key])
 	
 	_order_selfs = []
-	var order_self_dict = MetaConsts.get("orderSelf", {})
+	var order_self_dict = MetaConsts.orderSelf
 	for key in order_self_dict:
 		_order_selfs.append(order_self_dict[key])
 
@@ -108,7 +108,7 @@ func _render_order_self_item(item, meta: Dictionary, idx: int) -> void:
 		item.pressed.connect(_on_click_order_self_item.bind(idx))
 
 func _filter_launchers(character_element_type: int) -> void:
-	var launcher_dict = MetaConsts.get("launchers", {})
+	var launcher_dict = MetaConsts.launchers
 	_launchers = []
 	
 	for key in launcher_dict:

@@ -12,6 +12,7 @@ var entity_manager: EntityManager = null
 var entity_service: EntityService = null
 
 # 服务层
+var config_service: ConfigService = null
 var game_state_service: GameStateService = null
 var inventory_service: InventoryService = null
 var persistence_service: PersistenceService = null
@@ -24,6 +25,7 @@ func _init():
 	entity_service = EntityService.new(entity_manager)
 	
 	# 初始化服务层
+	config_service = ConfigService.new()
 	game_state_service = GameStateService.new()
 	inventory_service = InventoryService.new()
 	persistence_service = PersistenceService.new()

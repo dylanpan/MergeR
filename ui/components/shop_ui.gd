@@ -47,7 +47,7 @@ func _update_item_slots() -> void:
 		var slot = item_slots.get_child(i)
 		var item_id = shop_comp.get_item_id(i)
 		if item_id:
-			var item_meta = MetaConsts.get("shopItems", {}).get(item_id, {})
+			var item_meta = MetaConsts.shopItems.get(item_id, {})
 			if slot.has_node("lblName"):
 				slot.get_node("lblName").text = item_meta.get("name", "")
 			if slot.has_node("lblPrice"):

@@ -9,27 +9,34 @@ const DEFAULT_BULLET_ID = 8001
 
 # ==================== 元素合并 ====================
 
-func can_element_merge(e1, e2) -> bool:
+func can_element_merge(e1, e2, world: World = null) -> bool:
 	var data1 = e1.get_component(ComponentNames.DATA).data if e1.get_component(ComponentNames.DATA) else null
 	var data2 = e2.get_component(ComponentNames.DATA).data if e2.get_component(ComponentNames.DATA) else null
 	if data1 and data2:
-		var meta = MetaConsts.get("elements", {}).get(data2["id"], null)
+		var meta = _get_element_meta(data2["id"], world)
 		return data1["id"] == data2["id"] and meta and meta.get("mergeId", 0) > 0
 	return false
 
-func get_element_merge_output_data(entity) -> Dictionary:
+func get_element_merge_output_data(entity, world: World = null) -> Dictionary:
 	var data_comp = entity.get_component(ComponentNames.DATA)
 	if data_comp and data_comp.data:
 		var data = data_comp.data
-		var meta = MetaConsts.get("elements", {}).get(data["id"], null)
+		var meta = _get_element_meta(data["id"], world)
 		if meta:
 			return {"id": meta["mergeId"], "type": 1}
 	return {}
 
-func create_element_data(id: int) -> Dictionary:
-	var element_meta = MetaConsts.get("launchers", {}).get(id, null)
+func create_element_data(id: int, world: World = null) -> Dictionary:
+	var config = _get_config_service(world)
+	if config:
+		var element_meta = config.get_launcher(id)
+		if not element_meta.is_empty():
+			return _build_from_launcher(element_meta, config)
+	
+	# Fallback to direct MetaConsts
+	var element_meta = MetaConsts.launchers.get(id, null)
 	if not element_meta:
-		var fallback_meta = MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
+		var fallback_meta = MetaConsts.elements.get(DEFAULT_BULLET_ID, null)
 		if fallback_meta:
 			return {
 				"id": fallback_meta.get("id", DEFAULT_BULLET_ID),
@@ -40,17 +47,29 @@ func create_element_data(id: int) -> Dictionary:
 				"elementType": fallback_meta.get("elementType", 0),
 			}
 		return {"id": DEFAULT_BULLET_ID, "type": 1, "elementType": 0}
+	
 	var chosen_element_type = _get_element_type(element_meta)
 	var TYPE_TO_BULLET = {
-		1: 1001, # 火
-		2: 2001, # 水
-		3: 4001, # 风
-		4: 6001, # 土
-		0: 8001, # 无属性
+		1: 1001, 2: 2001, 3: 4001, 4: 6001, 0: 8001,
 	}
 	var bullet_id = TYPE_TO_BULLET.get(chosen_element_type, DEFAULT_BULLET_ID)
-	var bullet_meta = MetaConsts.get("elements", {}).get(bullet_id, null)
-	var meta = bullet_meta if bullet_meta else MetaConsts.get("elements", {}).get(DEFAULT_BULLET_ID, null)
+	return _build_bullet_data(bullet_id, chosen_element_type)
+
+func _build_from_launcher(launcher_meta: Dictionary, config) -> Dictionary:
+	var chosen_element_type = _get_element_type(launcher_meta)
+	var TYPE_TO_BULLET = {
+		1: 1001, 2: 2001, 3: 4001, 4: 6001, 0: 8001,
+	}
+	var bullet_id = TYPE_TO_BULLET.get(chosen_element_type, DEFAULT_BULLET_ID)
+	var bullet_meta = config.get_element(bullet_id)
+	return _build_meta_data(bullet_meta, bullet_id, chosen_element_type)
+
+func _build_bullet_data(bullet_id: int, chosen_element_type: int) -> Dictionary:
+	var bullet_meta = MetaConsts.elements.get(bullet_id, null)
+	var meta = bullet_meta if bullet_meta else MetaConsts.elements.get(DEFAULT_BULLET_ID, null)
+	return _build_meta_data(meta, bullet_id, chosen_element_type)
+
+func _build_meta_data(meta, bullet_id: int, chosen_element_type: int) -> Dictionary:
 	if meta:
 		return {
 			"id": meta.get("id", bullet_id),
@@ -61,6 +80,19 @@ func create_element_data(id: int) -> Dictionary:
 			"elementType": meta.get("elementType", chosen_element_type),
 		}
 	return {"id": bullet_id, "type": 1, "elementType": chosen_element_type}
+
+func _get_element_meta(id: int, world: World = null) -> Dictionary:
+	var config = _get_config_service(world)
+	if config:
+		return config.get_element(id)
+	return MetaConsts.elements.get(id, {})
+
+func _get_config_service(world: World = null):
+	if world and world.config_service:
+		return world.config_service
+	if ClearRoguelikeManager.get_world():
+		return ClearRoguelikeManager.get_world().config_service
+	return null
 
 func _get_element_type(element_meta: Dictionary) -> int:
 	if not element_meta:

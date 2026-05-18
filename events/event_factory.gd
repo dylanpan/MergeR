@@ -30,7 +30,7 @@ static func create_event_entity(event_id: int, meta: Dictionary = {}) -> BaseEve
 	
 	# 注入元数据配置：若未提供 meta，从 MetaConsts 自动读取
 	if meta.is_empty() and MetaConsts.has("gameEvents"):
-		meta = MetaConsts.get("gameEvents", {}).get(event_id, {})
+		meta = MetaConsts.gameEvents.get(event_id, {})
 	
 	entity.init(meta)
 	return entity

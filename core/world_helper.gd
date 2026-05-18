@@ -43,9 +43,28 @@ static func get_systems() -> Array:
 
 # 根据实体ID从MetaConsts获取配置
 static func get_meta(type_name: String, id: int):
-	if not MetaConsts.get(type_name, {}).has(id):
+	# type_name 是动态字符串，特殊处理
+	var dict = _get_meta_dict(type_name)
+	if dict.is_empty() or not dict.has(id):
 		return null
-	return MetaConsts.get(type_name, {}).get(id, null)
+	return dict.get(id, null)
+
+static func _get_meta_dict(type_name: String) -> Dictionary:
+	match type_name:
+		"orderEnermy": return MetaConsts.orderEnermy
+		"orderSelf": return MetaConsts.orderSelf
+		"elements": return MetaConsts.elements
+		"launchers": return MetaConsts.launchers
+		"buffs": return MetaConsts.buffs
+		"skills": return MetaConsts.skills
+		"shopItems": return MetaConsts.shopItems
+		"gameShops": return MetaConsts.gameShops
+		"gameEvents": return MetaConsts.gameEvents
+		"gameRests": return MetaConsts.gameRests
+		"gameLevels": return MetaConsts.gameLevels
+		"gameRounds": return MetaConsts.gameRounds
+		_:
+			return {}
 
 # 检查实体是否存活
 static func is_alive(entity) -> bool:
@@ -90,7 +109,7 @@ static func get_hp_percent(entity) -> float:
 			var max_hp = data.get("maxHp", hp)
 			if max_hp <= 0:
 				max_hp = 1
-			var order_meta = MetaConsts.get("orderEnermy", {}).get(meta_id, {})
+			var order_meta = MetaConsts.orderEnermy.get(meta_id, {})
 			if order_meta.get("hp", 0) > 0:
 				max_hp = order_meta["hp"]
 			return clamp(float(hp) / float(max_hp), 0.0, 1.0)

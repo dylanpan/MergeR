@@ -68,7 +68,7 @@ func _init_role() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.get("orderEnermy", {}).get(data.get("id", 0), {})
+		var meta = MetaConsts.orderEnermy.get(data.get("id", 0), {})
 		var role_id = meta.get("role", 1)
 		var level = meta.get("level", 1)
 		
@@ -92,7 +92,7 @@ func _init_hp() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.get("orderEnermy", {}).get(data.get("id", 0), {})
+		var meta = MetaConsts.orderEnermy.get(data.get("id", 0), {})
 		var hp_text = str(data.get("hp", 0)) + "/" + str(meta.get("hp", 0))
 		node_order.get_node("lbHp").text = hp_text
 

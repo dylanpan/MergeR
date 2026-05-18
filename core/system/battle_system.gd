@@ -125,7 +125,7 @@ func _process_order_defeated(entity) -> void:
 		return
 	var data = data_comp.data
 	if data.get("type") == GameConsts.OrderType_Enermy and data.get("hp", 0) <= 0:
-		var order_meta = MetaConsts.get("orderEnermy", {}).get(data["id"], {})
+		var order_meta = MetaConsts.orderEnermy.get(data["id"], {})
 		var drop_items = order_meta.get("dropItems", [])
 		for drop_item in drop_items:
 			var chance = drop_item.get("chance", 0.0)

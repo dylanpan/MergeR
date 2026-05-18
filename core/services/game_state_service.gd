@@ -60,13 +60,14 @@ func set_cur_level(value: int) -> void:
 func get_cur_game_type() -> int:
 	return cur_game_type
 
-func to_next_level() -> void:
+func to_next_level(world: World = null) -> void:
 	if runtime_map:
 		reset_round()
 		set_cur_level(-2)
 		return
 	reset_round()
-	var next_levels = MetaConsts.get("gameLevels", {}).get(cur_level, {}).get("next", [])
+	var level_meta = _get_level_meta(world)
+	var next_levels = level_meta.get("next", [])
 	if not next_levels.is_empty():
 		set_cur_level(-1)
 		set_cur_level(next_levels[0])
@@ -81,35 +82,35 @@ func get_cur_round_idx() -> int:
 func reset_round() -> void:
 	cur_round_idx = 0
 
-func add_round() -> void:
+func add_round(world: World = null) -> void:
 	if runtime_map:
 		if cur_round_idx < runtime_map.layers.size() - 1:
 			cur_round_idx += 1
 		return
-	var level_meta = MetaConsts.get("gameLevels", {}).get(cur_level, {})
+	var level_meta = _get_level_meta(world)
 	var round_ids = level_meta.get("rounds", [])
 	if cur_round_idx < round_ids.size() - 1:
 		cur_round_idx += 1
 
-func is_cur_round_finish() -> bool:
+func is_cur_round_finish(world: World = null) -> bool:
 	if runtime_map:
 		return cur_round_idx >= runtime_map.layers.size() - 1
-	var level_meta = MetaConsts.get("gameLevels", {}).get(cur_level, {})
+	var level_meta = _get_level_meta(world)
 	var round_ids = level_meta.get("rounds", [])
 	return cur_round_idx >= round_ids.size() - 1
 
-func get_cur_round_meta() -> Dictionary:
+func get_cur_round_meta(world: World = null) -> Dictionary:
 	if runtime_map:
 		var node = runtime_map.layers[cur_round_idx]
 		if node and node.get("roundId"):
 			var round_data = runtime_map.game_rounds.get(node.roundId)
 			if round_data:
 				return round_data
-	var level_meta = MetaConsts.get("gameLevels", {}).get(cur_level, {})
+	var level_meta = _get_level_meta(world)
 	var round_ids = level_meta.get("rounds", [])
 	if cur_round_idx < round_ids.size():
 		var round_id = round_ids[cur_round_idx]
-		return MetaConsts.get("gameRounds", {}).get(round_id, {})
+		return _get_round_meta(round_id, world)
 	return {}
 
 # ==================== 步数 ====================
@@ -123,8 +124,8 @@ func get_round_total_step() -> int:
 func reset_round_total_step() -> void:
 	round_total_step = 0
 
-func get_step_progress() -> Dictionary:
-	var round_meta = get_cur_round_meta()
+func get_step_progress(world: World = null) -> Dictionary:
+	var round_meta = get_cur_round_meta(world)
 	var max_step = round_meta.get("step", 0) if round_meta else 0
 	var current = round_total_step
 	var progress = float(current) / float(max_step) if max_step > 0 else 0.0
@@ -187,21 +188,21 @@ func set_select_order_self_id(value: int) -> void:
 func get_selected_character_template_id() -> int:
 	return select_order_self_id
 
-func get_selected_character_template() -> Dictionary:
+func get_selected_character_template(world: World = null) -> Dictionary:
 	if not select_order_self_id:
 		return {}
-	return MetaConsts.get("orderSelf", {}).get(select_order_self_id, {})
+	if world and world.config_service:
+		return world.config_service.get_self(select_order_self_id)
+	return MetaConsts.orderSelf.get(select_order_self_id, {})
 
-# ==================== 重置 ====================
+# ==================== 内部辅助 ====================
 
-func reset() -> void:
-	cur_game_type = 1
-	cur_level = 0
-	cur_round_idx = 0
-	round_total_step = 0
-	runtime_map = null
-	temp_ui_difficulty = 5
-	temp_ui_seed = 0
-	select_launchers.clear()
-	select_order_self_id = 0
-	_stages.clear()
+func _get_level_meta(world: World = null) -> Dictionary:
+	if world and world.config_service:
+		return world.config_service.get_game_level(cur_level)
+	return MetaConsts.gameLevels.get(cur_level, {})
+
+func _get_round_meta(round_id: int, world: World = null) -> Dictionary:
+	if world and world.config_service:
+		return world.config_service.get_game_round(round_id)
+	return MetaConsts.gameRounds.get(round_id, {})
