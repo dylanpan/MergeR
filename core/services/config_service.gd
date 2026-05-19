@@ -3,7 +3,16 @@ class_name ConfigService
 # ============================================================
 # 配置服务（替代 MetaConsts.get("xxx", {}).get(id, {}) 直接调用的模式）
 # 所有配置访问通过此服务集中管理
+#
+# 预留可能：
+# 加入缓存层（比如把 MetaConsts 数据按需加载）
+# 加入配置热更新（运行时替换配置）
+# 加入数据监控/统计
 # ============================================================
+
+static var _instance: ConfigService = ConfigService.new()
+static func instance() -> ConfigService:
+	return _instance
 
 # ==============================================
 # 直接集合访问（返回完整字典）

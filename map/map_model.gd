@@ -22,7 +22,7 @@ static func create_empty_map(p_difficulty: int, p_seed: int) -> MapModel:
 	map.difficulty = p_difficulty
 	map.created_at = Time.get_unix_time_from_system()
 	map.layers = []
-	map.profile = ConfigService.new().get_difficulty_profile(p_difficulty)
+	map.profile = ConfigService.instance().get_difficulty_profile(p_difficulty)
 	return map
 
 static func validate_map_model(map_obj) -> bool:

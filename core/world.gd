@@ -25,7 +25,7 @@ func _init():
 	entity_service = EntityService.new(entity_manager)
 	
 	# 初始化服务层
-	config_service = ConfigService.new()
+	config_service = ConfigService.instance()
 	game_state_service = GameStateService.new()
 	inventory_service = InventoryService.new()
 	persistence_service = PersistenceService.new()
