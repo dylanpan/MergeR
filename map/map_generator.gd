@@ -288,7 +288,7 @@ static func sample_shop_by_difficulty(prng: Prng, profile: Dictionary, progress:
 
 static func generate_map(difficulty: int, seed: int) -> MapModel:
 	var prng = Prng.new(seed)
-	var profile = MetaConsts.get_difficulty_profile(difficulty)
+	var profile = ConfigService.new().get_difficulty_profile(difficulty)
 	var map = MapModel.create_empty_map(difficulty, seed)
 	
 	# 生成三级结构数据

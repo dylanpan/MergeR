@@ -15,7 +15,8 @@ var priority: int = 1
 func _init(p_skill_id: int = 0, p_priority: int = 1):
 	comp_name = "BossSkill"
 	skill_id = p_skill_id
-	skill_data = MetaConsts.skills.get(p_skill_id, {})
+	var _world = ClearRoguelikeManager.get_world()
+	skill_data = _world.config_service.get_skill(p_skill_id) if _world and _world.config_service else {}
 	cooldown = skill_data.get("cooldown", 1)
 	priority = p_priority
 

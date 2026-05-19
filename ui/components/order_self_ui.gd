@@ -57,7 +57,8 @@ func _init_role() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.orderSelf.get(data.get("id", 0), {})
+		var _world = ClearRoguelikeManager.get_world()
+		var meta = _world.config_service.get_self(data.get("id", 0)) if _world and _world.config_service else {}
 		var role_id = meta.get("role", 1)
 		var texture_path = "res://assets/roles/order_role_" + str(role_id) + ".png"
 		node_order.get_node("spRole").texture = load(texture_path)
@@ -71,7 +72,8 @@ func _init_hp() -> void:
 		if not data_comp or not data_comp.data:
 			return
 		var data = data_comp.data
-		var meta = MetaConsts.orderSelf.get(data.get("id", 0), {})
+		var _world = ClearRoguelikeManager.get_world()
+		var meta = _world.config_service.get_self(data.get("id", 0)) if _world and _world.config_service else {}
 		var hp_text = str(data.get("hp", 0)) + "/" + str(meta.get("hp", 0))
 		node_order.get_node("lbHp").text = hp_text
 

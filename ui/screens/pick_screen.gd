@@ -34,12 +34,14 @@ func on_closed() -> void:
 
 func _init_data() -> void:
 	_launchers = []
-	var launcher_dict = MetaConsts.launchers
+	var _world = ClearRoguelikeManager.get_world()
+	var _config = _world.config_service if _world and _world.config_service else null
+	var launcher_dict = _config.get_launchers_map() if _config else {}
 	for key in launcher_dict:
 		_launchers.append(launcher_dict[key])
 	
 	_order_selfs = []
-	var order_self_dict = MetaConsts.orderSelf
+	var order_self_dict = _config.get_order_self_map() if _config else {}
 	for key in order_self_dict:
 		_order_selfs.append(order_self_dict[key])
 
@@ -108,7 +110,9 @@ func _render_order_self_item(item, meta: Dictionary, idx: int) -> void:
 		item.pressed.connect(_on_click_order_self_item.bind(idx))
 
 func _filter_launchers(character_element_type: int) -> void:
-	var launcher_dict = MetaConsts.launchers
+	var _world = ClearRoguelikeManager.get_world()
+	var _config = _world.config_service if _world and _world.config_service else null
+	var launcher_dict = _config.get_launchers_map() if _config else {}
 	_launchers = []
 	
 	for key in launcher_dict:

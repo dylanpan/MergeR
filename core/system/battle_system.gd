@@ -50,7 +50,7 @@ func _do_battle(atk_entities: Array, def_entities: Array, is_left: bool = true) 
 		
 		var cannot_atk = false
 		for bullet_id in bullets:
-			var meta = MetaConsts.elements.get(bullet_id, {})
+			var meta = _world.config_service.get_element(bullet_id)
 			if meta.is_empty():
 				continue
 			var distance = meta.get("distance", 1)
@@ -125,7 +125,7 @@ func _process_order_defeated(entity) -> void:
 		return
 	var data = data_comp.data
 	if data.get("type") == GameConsts.OrderType_Enermy and data.get("hp", 0) <= 0:
-		var order_meta = MetaConsts.orderEnermy.get(data["id"], {})
+		var order_meta = _world.config_service.get_enemy(data["id"])
 		var drop_items = order_meta.get("dropItems", [])
 		for drop_item in drop_items:
 			var chance = drop_item.get("chance", 0.0)
@@ -140,7 +140,7 @@ func _do_reset_step(entity) -> void:
 		return
 	var data = data_comp.data
 	if data.get("type") == GameConsts.OrderType_Enermy:
-		var order_meta = MetaConsts.orderEnermy.get(data.get("id", 0), {})
+		var order_meta = _world.config_service.get_enemy(data.get("id", 0))
 		data["step"] = order_meta.get("step", 0)
 
 func _do_change_pre_atker(entity) -> void:
@@ -163,10 +163,10 @@ func _reset_battle_flag(entities: Array) -> void:
 			data["isAtker"] = 0
 
 func _check_weakness_match(atk_elem: int, def_elem: int) -> bool:
-	return MetaConsts.elementWeakness.get(atk_elem, -1) == def_elem
+	return _world.config_service.is_weakness(atk_elem, def_elem)
 
 func _check_resistance_match(atk_elem: int, def_elem: int) -> bool:
-	return MetaConsts.elementWeakness.get(def_elem, -1) == atk_elem
+	return _world.config_service.is_resistance(atk_elem, def_elem)
 
 func _update_boss_abilities(dt: float) -> void:
 	if not _world:

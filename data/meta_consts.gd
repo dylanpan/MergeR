@@ -655,30 +655,5 @@ const difficultyProfiles: Dictionary = {
 }
 
 # ==============================================
-# 兼容性辅助方法（供 map 模块等静态调用）
-# ==============================================
-
-static func get_difficulty_profile(difficulty: int) -> Dictionary:
-	if difficulty <= 3:
-		return difficultyCurves.get("normal", {})
-	elif difficulty <= 6:
-		return difficultyCurves.get("hard", {})
-	else:
-		return difficultyCurves.get("expert", {})
-
-static func get_weakness_multiplier(atk_elem: int, def_elem: int) -> float:
-	var elem_mult = elementDamageMultiplier.get(atk_elem, {})
-	return elem_mult.get(def_elem, 1.0)
-
-static func is_weakness(atk_elem: int, def_elem: int) -> bool:
-	return elementWeakness.get(atk_elem, -1) == def_elem
-
-static func is_resistance(atk_elem: int, def_elem: int) -> bool:
-	return elementWeakness.get(def_elem, -1) == atk_elem
-
-static func get_element_damage_multiplier(atk_elem: int, def_elem: int) -> float:
-	return get_weakness_multiplier(atk_elem, def_elem)
-
-# ==============================================
 # 数值平衡校准完成 v1.1
 # ==============================================

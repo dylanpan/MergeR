@@ -18,7 +18,8 @@ func test_map_generation():
 	assert_eq(map_data.seed, 12345, "种子应为12345")
 
 func test_game_rounds():
-	var profile = MetaConsts.get_difficulty_profile(5)
+	var _config = ConfigService.new()
+	var profile = _config.get_difficulty_profile(5)
 	var prng = Prng.new(12345)
 	var rounds = MapGenerator.generate_game_rounds(profile, prng)
 	assert_gt(rounds.size(), 0, "应生成至少1个回合")

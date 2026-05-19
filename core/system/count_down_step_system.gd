@@ -26,7 +26,7 @@ func _update_order_enermy_entities() -> void:
 		if data.get("step", 1) <= 0 and not data.get("isPreAtker", false):
 			if data.get("bullets", []).is_empty():
 				# 装弹 - 恢复至原始步数
-				var origin_meta = MetaConsts.orderEnermy.get(data.get("id", 0), {})
+				var origin_meta = _world.config_service.get_enemy(data.get("id", 0))
 				data["step"] = origin_meta.get("step", 30)
 				var bullets = origin_meta.get("bullets", [])
 				data["bullets"] = data.get("bullets", []) + bullets

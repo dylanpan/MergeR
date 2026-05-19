@@ -217,7 +217,7 @@ func _game_round_over() -> void:
 	_world.game_state_service.to_next_level()
 	
 	var cur_level = _world.game_state_service.get_cur_level()
-	var level_meta = MetaConsts.gameLevels.get(cur_level, {})
+	var level_meta = _world.config_service.get_game_level(cur_level)
 	if level_meta.is_empty():
 		GlobalEventBus.event_round_update.emit({"type": "new_level"})
 		return
@@ -226,21 +226,21 @@ func _game_round_over() -> void:
 	var shops = level_meta.get("shops", [])
 	if not shops.is_empty():
 		for shop_id in shops:
-			GlobalEventBus.event_shop_open.emit(shop_id, MetaConsts.gameShops.get(shop_id, {}))
+			GlobalEventBus.event_shop_open.emit(shop_id, _world.config_service.get_game_shop(shop_id))
 		return
 	
 	# 检查事件配置
 	var events = level_meta.get("events", [])
 	if not events.is_empty():
 		for event_id in events:
-			GlobalEventBus.event_event_open.emit(event_id, MetaConsts.gameEvents.get(event_id, {}))
+			GlobalEventBus.event_event_open.emit(event_id, _world.config_service.get_game_event(event_id))
 		return
 	
 	# 检查休息节点配置
 	var rests = level_meta.get("rests", [])
 	if not rests.is_empty():
 		for rest_id in rests:
-			GlobalEventBus.event_rest_open.emit(rest_id, MetaConsts.gameRests.get(rest_id, {}))
+			GlobalEventBus.event_rest_open.emit(rest_id, _world.config_service.get_game_rest(rest_id))
 		return
 	
 	# 无特殊节点，继续下一关

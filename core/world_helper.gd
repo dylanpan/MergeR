@@ -37,35 +37,6 @@ static func is_game_over() -> bool:
 static func get_systems() -> Array:
 	return ClearRoguelikeManager.get_systems()
 
-# ============================================
-# 新增：补齐原 WorldHelper.js 的全部静态方法
-# ============================================
-
-# 根据实体ID从MetaConsts获取配置
-static func get_meta(type_name: String, id: int):
-	# type_name 是动态字符串，特殊处理
-	var dict = _get_meta_dict(type_name)
-	if dict.is_empty() or not dict.has(id):
-		return null
-	return dict.get(id, null)
-
-static func _get_meta_dict(type_name: String) -> Dictionary:
-	match type_name:
-		"orderEnermy": return MetaConsts.orderEnermy
-		"orderSelf": return MetaConsts.orderSelf
-		"elements": return MetaConsts.elements
-		"launchers": return MetaConsts.launchers
-		"buffs": return MetaConsts.buffs
-		"skills": return MetaConsts.skills
-		"shopItems": return MetaConsts.shopItems
-		"gameShops": return MetaConsts.gameShops
-		"gameEvents": return MetaConsts.gameEvents
-		"gameRests": return MetaConsts.gameRests
-		"gameLevels": return MetaConsts.gameLevels
-		"gameRounds": return MetaConsts.gameRounds
-		_:
-			return {}
-
 # 检查实体是否存活
 static func is_alive(entity) -> bool:
 	if not entity:
@@ -109,7 +80,8 @@ static func get_hp_percent(entity) -> float:
 			var max_hp = data.get("maxHp", hp)
 			if max_hp <= 0:
 				max_hp = 1
-			var order_meta = MetaConsts.orderEnermy.get(meta_id, {})
+			var world = ClearRoguelikeManager.get_world()
+			var order_meta = world.config_service.get_enemy(meta_id) if world and world.config_service else {}
 			if order_meta.get("hp", 0) > 0:
 				max_hp = order_meta["hp"]
 			return clamp(float(hp) / float(max_hp), 0.0, 1.0)

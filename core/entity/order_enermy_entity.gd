@@ -43,8 +43,9 @@ func init(data: Dictionary) -> void:
 		_init_boss_abilities(data)
 
 func _init_buff_from_config(buff_id: int) -> void:
-	"""从MetaConsts读取并应用固有Buff"""
-	var buff_data = MetaConsts.buffs.get(buff_id, {})
+	"""从ConfigService读取并应用固有Buff"""
+	var _world = ClearRoguelikeManager.get_world()
+	var buff_data = _world.config_service.get_buff(buff_id) if _world and _world.config_service else {}
 	if buff_data.is_empty():
 		return
 	

@@ -23,7 +23,7 @@ func get_element_merge_output_data(entity, world: World = null) -> Dictionary:
 		var data = data_comp.data
 		var meta = _get_element_meta(data["id"], world)
 		if meta:
-			return {"id": meta["mergeId"], "type": 1}
+			return {"id": meta.get("mergeId", 0), "type": 1}
 	return {}
 
 func create_element_data(id: int, world: World = null) -> Dictionary:
@@ -33,11 +33,14 @@ func create_element_data(id: int, world: World = null) -> Dictionary:
 		if not element_meta.is_empty():
 			return _build_from_launcher(element_meta, config)
 	
-	# Fallback to direct MetaConsts
-	var element_meta = MetaConsts.launchers.get(id, null)
-	if not element_meta:
-		var fallback_meta = MetaConsts.elements.get(DEFAULT_BULLET_ID, null)
-		if fallback_meta:
+	# Fallback: try config service via global manager
+	config = _get_config_service(null)
+	if config:
+		var element_meta = config.get_launcher(id)
+		if not element_meta.is_empty():
+			return _build_from_launcher(element_meta, config)
+		var fallback_meta = config.get_element(DEFAULT_BULLET_ID)
+		if not fallback_meta.is_empty():
 			return {
 				"id": fallback_meta.get("id", DEFAULT_BULLET_ID),
 				"type": fallback_meta.get("type", 1),
@@ -46,14 +49,8 @@ func create_element_data(id: int, world: World = null) -> Dictionary:
 				"cover": fallback_meta.get("cover", 0),
 				"elementType": fallback_meta.get("elementType", 0),
 			}
-		return {"id": DEFAULT_BULLET_ID, "type": 1, "elementType": 0}
 	
-	var chosen_element_type = _get_element_type(element_meta)
-	var TYPE_TO_BULLET = {
-		1: 1001, 2: 2001, 3: 4001, 4: 6001, 0: 8001,
-	}
-	var bullet_id = TYPE_TO_BULLET.get(chosen_element_type, DEFAULT_BULLET_ID)
-	return _build_bullet_data(bullet_id, chosen_element_type)
+	return {"id": DEFAULT_BULLET_ID, "type": 1, "elementType": 0}
 
 func _build_from_launcher(launcher_meta: Dictionary, config) -> Dictionary:
 	var chosen_element_type = _get_element_type(launcher_meta)
@@ -65,8 +62,10 @@ func _build_from_launcher(launcher_meta: Dictionary, config) -> Dictionary:
 	return _build_meta_data(bullet_meta, bullet_id, chosen_element_type)
 
 func _build_bullet_data(bullet_id: int, chosen_element_type: int) -> Dictionary:
-	var bullet_meta = MetaConsts.elements.get(bullet_id, null)
-	var meta = bullet_meta if bullet_meta else MetaConsts.elements.get(DEFAULT_BULLET_ID, null)
+	var config = _get_config_service(null)
+	var meta = config.get_element(bullet_id) if config else {}
+	if meta.is_empty() and config:
+		meta = config.get_element(DEFAULT_BULLET_ID)
 	return _build_meta_data(meta, bullet_id, chosen_element_type)
 
 func _build_meta_data(meta, bullet_id: int, chosen_element_type: int) -> Dictionary:
@@ -85,7 +84,7 @@ func _get_element_meta(id: int, world: World = null) -> Dictionary:
 	var config = _get_config_service(world)
 	if config:
 		return config.get_element(id)
-	return MetaConsts.elements.get(id, {})
+	return {}
 
 func _get_config_service(world: World = null):
 	if world and world.config_service:

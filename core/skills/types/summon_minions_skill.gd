@@ -21,7 +21,11 @@ func on_execute(context: Dictionary) -> void:
 	
 	for i in range(count):
 		# 获取小怪配置
-		var enermy_meta = MetaConsts.orderEnermy.get(minion_id, MetaConsts.orderEnermy.get(30001, {}))
+		var _world = ClearRoguelikeManager.get_world()
+		var _config = _world.config_service if _world and _world.config_service else null
+		var enermy_meta = _config.get_enemy(minion_id) if _config else {}
+		if enermy_meta.is_empty():
+			enermy_meta = _config.get_enemy(30001) if _config else {}
 		if enermy_meta.is_empty():
 			continue
 		

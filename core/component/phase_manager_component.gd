@@ -20,9 +20,12 @@ func _init():
 
 func init(phase_configs: Array, p_entity_id: String) -> void:
 	phases = []
+	var _world = ClearRoguelikeManager.get_world()
+	var _config = _world.config_service if _world and _world.config_service else null
 	for config in phase_configs:
 		var phase_id = config.get("phaseId", "")
-		var phase_config = MetaConsts.skills.get(config.get("skills", [{}])[0].get("skillId", 0), {})
+		var skill_id = config.get("skills", [{}])[0].get("skillId", 0)
+		var phase_config = _config.get_skill(skill_id) if _config else {}
 		phases.append({
 			"id": phase_id,
 			"hpThreshold": config.get("hpThreshold", 1.0),
