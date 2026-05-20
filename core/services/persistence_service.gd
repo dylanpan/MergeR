@@ -26,7 +26,7 @@ func create_new_game_data(record_json = null, select_launchers: Array = [], sele
 		return data
 	
 	var init_data = {}
-	var _config = ClearRoguelikeManager.get_world().config_service if ClearRoguelikeManager.get_world() else null
+	var _config = GdRoguelikeManager.get_world().config_service if GdRoguelikeManager.get_world() else null
 	init_data["launchers"] = {
 		0: _config.get_launcher(select_launchers[0]) if _config and select_launchers.size() > 0 else {},
 		1: _config.get_launcher(select_launchers[1]) if _config and select_launchers.size() > 1 else {},

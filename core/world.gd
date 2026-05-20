@@ -1,4 +1,5 @@
 extends Node
+class_name World
 
 # ============================================================
 # World 核心类（替代 World.js）
@@ -82,5 +83,5 @@ func destroy() -> void:
 	inventory_service.reset()
 	persistence_service.reset()
 	ui_root_service.reset()
-	if ClearRoguelikeManager.game_session:
-		ClearRoguelikeManager.game_session.set_init_flag(false)
+	if GdRoguelikeManager.game_session:
+		GdRoguelikeManager.game_session.set_init_flag(false)

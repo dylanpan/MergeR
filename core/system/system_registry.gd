@@ -53,8 +53,8 @@ func register_builtin() -> void:
 	register(BattleSystem.new(), Phase.BATTLE, 0)
 	register(RoundSystem.new(), Phase.POST_BATTLE, 0)
 	register(ShopSystem.new(), Phase.POST_BATTLE, 10)
-	register(EventSystem.new(), Phase.POST_BATTLE, 20)
-	register(RestSystem.new(), Phase.POST_BATTLE, 30)
+	# register(EventSystem.new(), Phase.POST_BATTLE, 20)
+	# register(RestSystem.new(), Phase.POST_BATTLE, 30)
 
 # ==================== 查询 ====================
 

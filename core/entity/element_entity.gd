@@ -37,7 +37,7 @@ func init(data: Dictionary) -> void:
 	# 初始化配置中的BuffId
 	var buff_id = data.get("buffId", 0)
 	if buff_id:
-		var _world = ClearRoguelikeManager.get_world()
+		var _world = GdRoguelikeManager.get_world()
 		var buff_config = _world.config_service.get_buff(buff_id) if _world and _world.config_service else {}
 		if not buff_config.is_empty():
 			var buff_comp = get_component(ComponentNames.BUFF) as BuffComponent

@@ -6,6 +6,8 @@ extends BaseSystem
 # 中央状态管理，确保同一时间只有一个休息点活跃
 # ============================================================
 
+class_name RestSystem
+
 var _current_rest = null
 
 func _init():

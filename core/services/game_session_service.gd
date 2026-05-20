@@ -60,7 +60,7 @@ func get_selected_character_template_id() -> int:
 func get_selected_character_template() -> Dictionary:
 	if not select_order_self_id:
 		return {}
-	var _world = ClearRoguelikeManager.get_world()
+	var _world = GdRoguelikeManager.get_world()
 	if _world and _world.config_service:
 		return _world.config_service.get_self(select_order_self_id)
 	return {}

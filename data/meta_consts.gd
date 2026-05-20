@@ -560,7 +560,7 @@ const shopItems: Dictionary = {
 }
 
 # 旧items配置（兼容）
-const items: Dictionary = shopItems.duplicate(true)
+static var items: Dictionary = shopItems.duplicate(true)
 
 # ==============================================
 # 商店系统 v1.0

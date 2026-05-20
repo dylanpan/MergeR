@@ -13,7 +13,7 @@ func _ready() -> void:
 	ui_name = "map_preview"
 
 func on_opened(params = null) -> void:
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if not session or not session.has_runtime_map():
 		push_warning("MapPreviewScreen: 没有运行时地图数据")
 		return
@@ -30,7 +30,7 @@ func on_closed() -> void:
 	_runtime_map = null
 
 func open(param: Dictionary = {}) -> void:
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if not session or not session.has_runtime_map():
 		return
 	

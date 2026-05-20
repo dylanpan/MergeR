@@ -5,6 +5,8 @@ extends Node
 # 负责根据事件ID创建对应的事件实体实例，并注入元数据配置
 # ============================================================
 
+class_name EventFactory
+
 # 注册表：存储事件ID到构造函数的映射
 static var _event_registry: Dictionary = {}
 

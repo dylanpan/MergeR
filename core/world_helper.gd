@@ -5,7 +5,7 @@ extends Node
 # 提供通用的辅助方法集合，简化游戏逻辑调用
 #
 # 【架构说明】
-# 静态方法获取 World 实例通过 ClearRoguelikeManager.get_world()
+# 静态方法获取 World 实例通过 GdRoguelikeManager.get_world()
 # 新代码应优先通过 World 的服务层访问数据
 # ============================================================
 
@@ -13,14 +13,14 @@ class_name WorldHelper
 
 # 根据实体ID获取实体（通过 World 的 entity_manager）
 static func get_entity_by_id(entity_id: String):
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		return world.entity_manager.get_by_id(entity_id)
 	return null
 
 # 获取当前回合进度
 static func get_round_progress() -> float:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		var progress = world.game_state_service.get_step_progress()
 		return progress.get("progress", 0.0)
@@ -28,14 +28,14 @@ static func get_round_progress() -> float:
 
 # 检查游戏是否结束
 static func is_game_over() -> bool:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		return not world.entity_service.has_alive_self()
 	return false
 
 # 获取管理器中的系统
 static func get_systems() -> Array:
-	return ClearRoguelikeManager.get_systems()
+	return GdRoguelikeManager.get_systems()
 
 # 检查实体是否存活
 static func is_alive(entity) -> bool:
@@ -80,7 +80,7 @@ static func get_hp_percent(entity) -> float:
 			var max_hp = data.get("maxHp", hp)
 			if max_hp <= 0:
 				max_hp = 1
-			var world = ClearRoguelikeManager.get_world()
+			var world = GdRoguelikeManager.get_world()
 			var order_meta = world.config_service.get_enemy(meta_id) if world and world.config_service else {}
 			if order_meta.get("hp", 0) > 0:
 				max_hp = order_meta["hp"]
@@ -109,21 +109,21 @@ static func get_atk(entity) -> int:
 
 # 获取当前己方单位数量
 static func get_ally_count() -> int:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		return world.entity_service.get_order_self().size()
 	return 0
 
 # 获取当前敌方单位数量
 static func get_enemy_count() -> int:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		return world.entity_service.get_order_enemy().size()
 	return 0
 
 # 获取当前步数进度百分比 (0~1)
 static func get_step_progress_percent() -> float:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		var progress = world.game_state_service.get_step_progress()
 		return progress.get("progress", 0.0)
@@ -131,7 +131,7 @@ static func get_step_progress_percent() -> float:
 
 # 在当前所有敌方中随机选择一个
 static func get_random_enemy():
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		var enemies = world.entity_service.get_order_enemy()
 		if enemies.is_empty():
@@ -142,7 +142,7 @@ static func get_random_enemy():
 
 # 获取当前关卡名称
 static func get_level_name() -> String:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		var level = world.game_state_service.get_cur_level()
 		return "第 " + str(level + 1) + " 关"

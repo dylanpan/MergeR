@@ -1,4 +1,5 @@
 extends BaseSystem
+class_name RoundSystem
 
 # ============================================================
 # 回合系统（替代 RoundSystem.js - 410行）

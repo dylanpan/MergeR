@@ -20,7 +20,7 @@ func get_ui_data() -> Dictionary:
 	return data
 
 func on_confirm() -> void:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		return
 	

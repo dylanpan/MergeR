@@ -1,5 +1,5 @@
 extends UIBase
-class_name PopupPanel
+class_name PopupPanelTemplate
 
 # ============================================================
 # 通用弹窗模板

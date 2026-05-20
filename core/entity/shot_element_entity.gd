@@ -45,7 +45,7 @@ func click_attack() -> void:
 	点击攻击位的核心逻辑（简化版，保留关键流程）：
 	收集子弹 → 标记攻击者 → 触发战斗阶段
 	"""
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		return
 	

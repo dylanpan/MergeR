@@ -56,7 +56,7 @@ func _give_reward() -> void:
 	if _reward.is_empty():
 		return
 	
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		return
 	

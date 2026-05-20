@@ -20,7 +20,7 @@ func _init():
 
 func init(phase_configs: Array, p_entity_id: String) -> void:
 	phases = []
-	var _world = ClearRoguelikeManager.get_world()
+	var _world = GdRoguelikeManager.get_world()
 	var _config = _world.config_service if _world and _world.config_service else null
 	for config in phase_configs:
 		var phase_id = config.get("phaseId", "")

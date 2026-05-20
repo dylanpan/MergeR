@@ -21,7 +21,7 @@ static func instance() -> ConfigService:
 func get_element_weakness() -> Dictionary:
 	return MetaConsts.elementWeakness
 
-func get_element_damage_multiplier() -> Dictionary:
+func get_element_damage_multiplier_map() -> Dictionary:
 	return MetaConsts.elementDamageMultiplier
 
 func get_difficulty_curves() -> Dictionary:

@@ -90,7 +90,7 @@ func _on_click_btn_close() -> void:
 
 func _on_click_btn_go() -> void:
 	# 保存数据到 session，供 pick_screen 读取
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if session:
 		session.set_ui_temp_data(_selected_difficulty, _seed)
 	

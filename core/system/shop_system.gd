@@ -1,4 +1,5 @@
 extends BaseSystem
+class_name ShopSystem
 
 # ============================================================
 # 商店系统（替代 ShopSystem.js）

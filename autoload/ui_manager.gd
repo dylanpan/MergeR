@@ -1,5 +1,4 @@
 extends Node
-class_name UIManager
 
 # ============================================================
 # UI 管理器（Autoload 单例）
@@ -96,7 +95,8 @@ func _load_ui_mapping():
 
 
 func _create_default_layers():
-	for name, cfg_dict in default_layer_config:
+	for name in default_layer_config:
+		var cfg_dict = default_layer_config[name]
 		var cfg = UILayerConfig.new()
 		cfg.layer_name = name
 		cfg.z_index = cfg_dict.get("z", 0)

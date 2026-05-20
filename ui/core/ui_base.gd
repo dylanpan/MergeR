@@ -44,7 +44,7 @@ func animate_in():
 	visible = true
 	_kill_tween()
 	_tween = create_tween()
-	_tween.set_trans(Tween.TRANS_EASE_OUT)
+	_tween.set_trans(Tween.TRANS_SINE)
 	_tween.set_ease(Tween.EASE_OUT)
 	
 	match anim_in_type:
@@ -70,7 +70,7 @@ func animate_out():
 	
 	_kill_tween()
 	_tween = create_tween()
-	_tween.set_trans(Tween.TRANS_EASE_IN)
+	_tween.set_trans(Tween.TRANS_SINE)
 	_tween.set_ease(Tween.EASE_IN)
 	
 	match anim_out_type:

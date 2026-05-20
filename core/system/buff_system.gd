@@ -6,6 +6,8 @@ extends BaseSystem
 # 使用 ECS 架构：通过 BuffRegistry 动态创建 BaseBuff 类实例
 # ============================================================
 
+class_name BuffSystem
+
 static var _instance: BuffSystem = null
 var _entity_buffs: Dictionary = {}  # entity_id -> Array<BaseBuff>
 var _initialized: bool = false

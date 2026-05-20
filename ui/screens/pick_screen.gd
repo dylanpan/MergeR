@@ -16,7 +16,7 @@ func _ready() -> void:
 	ui_name = "pick_screen"
 
 func on_opened(params = null) -> void:
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if session:
 		_difficulty = session.get_ui_temp_difficulty()
 		_seed = session.get_ui_temp_seed()
@@ -34,7 +34,7 @@ func on_closed() -> void:
 
 func _init_data() -> void:
 	_launchers = []
-	var _world = ClearRoguelikeManager.get_world()
+	var _world = GdRoguelikeManager.get_world()
 	var _config = _world.config_service if _world and _world.config_service else null
 	var launcher_dict = _config.get_launchers_map() if _config else {}
 	for key in launcher_dict:
@@ -110,7 +110,7 @@ func _render_order_self_item(item, meta: Dictionary, idx: int) -> void:
 		item.pressed.connect(_on_click_order_self_item.bind(idx))
 
 func _filter_launchers(character_element_type: int) -> void:
-	var _world = ClearRoguelikeManager.get_world()
+	var _world = GdRoguelikeManager.get_world()
 	var _config = _world.config_service if _world and _world.config_service else null
 	var launcher_dict = _config.get_launchers_map() if _config else {}
 	_launchers = []
@@ -146,7 +146,7 @@ func _on_click_btn_go() -> void:
 	if _select_order_self_id == 0:
 		return
 	
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if session:
 		session.set_select_launchers(_select_launchers)
 		session.set_select_order_self_id(_select_order_self_id)

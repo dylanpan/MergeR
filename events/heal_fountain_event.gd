@@ -10,7 +10,7 @@ func _init(p_event_id: int = 70002):
 # 初始化时从配置读取 healPercent 预计算治疗量
 func on_init() -> void:
 	var heal_percent = _meta.get("healPercent", 0.5)  # 默认50%
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		_heal_amount = 30  # fallback
 		return
@@ -42,7 +42,7 @@ func _heal_player() -> void:
 	if _heal_amount <= 0:
 		return
 	
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		return
 	

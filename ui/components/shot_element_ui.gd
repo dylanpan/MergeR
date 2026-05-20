@@ -16,7 +16,7 @@ func update_ui_icon() -> void:
 
 func update_finish_button_state() -> void:
 	# 检查是否有子弹
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	var has_bullets = false
 	
 	if world:

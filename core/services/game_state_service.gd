@@ -193,7 +193,7 @@ func get_selected_character_template(world: World = null) -> Dictionary:
 		return {}
 	if world and world.config_service:
 		return world.config_service.get_self(select_order_self_id)
-	var w = ClearRoguelikeManager.get_world()
+	var w = GdRoguelikeManager.get_world()
 	if w and w.config_service:
 		return w.config_service.get_self(select_order_self_id)
 	return {}
@@ -203,7 +203,7 @@ func get_selected_character_template(world: World = null) -> Dictionary:
 func _get_level_meta(world: World = null) -> Dictionary:
 	if world and world.config_service:
 		return world.config_service.get_game_level(cur_level)
-	var w = ClearRoguelikeManager.get_world()
+	var w = GdRoguelikeManager.get_world()
 	if w and w.config_service:
 		return w.config_service.get_game_level(cur_level)
 	return {}
@@ -211,7 +211,7 @@ func _get_level_meta(world: World = null) -> Dictionary:
 func _get_round_meta(round_id: int, world: World = null) -> Dictionary:
 	if world and world.config_service:
 		return world.config_service.get_game_round(round_id)
-	var w = ClearRoguelikeManager.get_world()
+	var w = GdRoguelikeManager.get_world()
 	if w and w.config_service:
 		return w.config_service.get_game_round(round_id)
 	return {}

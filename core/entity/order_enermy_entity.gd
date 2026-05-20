@@ -44,7 +44,7 @@ func init(data: Dictionary) -> void:
 
 func _init_buff_from_config(buff_id: int) -> void:
 	"""从ConfigService读取并应用固有Buff"""
-	var _world = ClearRoguelikeManager.get_world()
+	var _world = GdRoguelikeManager.get_world()
 	var buff_data = _world.config_service.get_buff(buff_id) if _world and _world.config_service else {}
 	if buff_data.is_empty():
 		return
@@ -80,7 +80,7 @@ func _init_boss_abilities(data: Dictionary) -> void:
 	# 初始化阶段管理器
 	var phase_manager = PhaseManagerComponent.new()
 	add_component(phase_manager)
-	phase_manager.init(phases, -1)
+	phase_manager.init(phases, str(-1))
 	
 	# 初始化技能管理器
 	var skill_comp = get_component(ComponentNames.SKILL) as SkillComponent

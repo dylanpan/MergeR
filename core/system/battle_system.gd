@@ -1,4 +1,5 @@
 extends BaseSystem
+class_name BattleSystem
 
 # ============================================================
 # 战斗系统（替代 BattleSystem.js）

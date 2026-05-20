@@ -10,6 +10,6 @@ func _init(buff_data: Dictionary = {}):
 
 func on_round_start(context: BuffContext):
 	var value = get_buff_value()
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world:
 		world.game_state_service.add_round_total_step(value)

@@ -1,4 +1,5 @@
 extends BaseSystem
+class_name CountDownStepSystem
 
 # ============================================================
 # 倒计时步数系统（替代 CountDownStepSystem.js）

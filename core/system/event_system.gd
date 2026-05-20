@@ -1,4 +1,5 @@
 extends BaseSystem
+class_name EventSystem
 
 # ============================================================
 # 事件系统（替代 EventSystem.js）

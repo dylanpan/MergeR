@@ -1,4 +1,5 @@
 extends Node
+class_name BuffRegistry
 
 # ============================================================
 # Buff 注册器（替代 BuffRegistry.js）

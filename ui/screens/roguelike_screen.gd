@@ -28,10 +28,10 @@ func on_closed() -> void:
 	if GlobalEventBus.event_game_state.is_connected(_on_game_state_update):
 		GlobalEventBus.event_game_state.disconnect(_on_game_state_update)
 	
-	ClearRoguelikeManager.destroy_world()
+	GdRoguelikeManager.destroy_world()
 
 func _init_data(param: Dictionary = {}) -> void:
-	var session = ClearRoguelikeManager.game_session
+	var session = GdRoguelikeManager.game_session
 	if not session:
 		return
 	
@@ -72,7 +72,7 @@ func _init_btns() -> void:
 			btn_map.pressed.connect(_on_click_btn_map)
 
 func _start_game() -> void:
-	_runtime_map = ClearRoguelikeManager.game_session.get_runtime_map() if ClearRoguelikeManager.game_session else null
+	_runtime_map = GdRoguelikeManager.game_session.get_runtime_map() if GdRoguelikeManager.game_session else null
 	_current_node_id = null
 	_completed_node_ids = {}
 	
@@ -86,15 +86,15 @@ func _start_game() -> void:
 		if first_node:
 			_current_node_id = first_node.get("id", null)
 			var ui_container = get_node("nodeDialog") if has_node("nodeDialog") else self
-			ClearRoguelikeManager.create_world(ui_container)
+			GdRoguelikeManager.create_world(ui_container)
 			_on_update_step()
 
 func _on_update_step() -> void:
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if world and world.has_method("tick"):
 		world.tick(0.0)
 	else:
-		var systems = ClearRoguelikeManager.get_systems()
+		var systems = GdRoguelikeManager.get_systems()
 		for system in systems:
 			system.update(0.0)
 
@@ -107,11 +107,11 @@ func _on_game_state_update(data: Dictionary) -> void:
 			_on_game_win()
 
 func _on_game_over() -> void:
-	ClearRoguelikeManager.destroy_world()
+	GdRoguelikeManager.destroy_world()
 	_close_to_pick()
 
 func _on_game_win() -> void:
-	ClearRoguelikeManager.destroy_world()
+	GdRoguelikeManager.destroy_world()
 	
 	if _current_node_id:
 		_completed_node_ids[_current_node_id] = true
@@ -129,7 +129,7 @@ func _on_game_win() -> void:
 			if next_node:
 				_current_node_id = next_node.get("id", null)
 				var ui_container = get_node("nodeDialog") if has_node("nodeDialog") else self
-				ClearRoguelikeManager.create_world(ui_container)
+				GdRoguelikeManager.create_world(ui_container)
 				_on_update_step()
 				return
 	
@@ -140,7 +140,7 @@ func _close_to_pick() -> void:
 	close()
 
 func _on_click_btn_back() -> void:
-	ClearRoguelikeManager.destroy_world()
+	GdRoguelikeManager.destroy_world()
 	close()
 
 func _on_click_btn_map() -> void:

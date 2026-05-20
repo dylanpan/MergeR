@@ -89,8 +89,8 @@ func _get_element_meta(id: int, world: World = null) -> Dictionary:
 func _get_config_service(world: World = null):
 	if world and world.config_service:
 		return world.config_service
-	if ClearRoguelikeManager.get_world():
-		return ClearRoguelikeManager.get_world().config_service
+	if GdRoguelikeManager.get_world():
+		return GdRoguelikeManager.get_world().config_service
 	return null
 
 func _get_element_type(element_meta: Dictionary) -> int:

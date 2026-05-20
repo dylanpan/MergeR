@@ -55,7 +55,7 @@ func _apply_buff() -> void:
 	if _selected_buff.is_empty():
 		return
 	
-	var world = ClearRoguelikeManager.get_world()
+	var world = GdRoguelikeManager.get_world()
 	if not world:
 		return
 	

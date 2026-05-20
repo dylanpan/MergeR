@@ -350,19 +350,24 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 			# 精英概率
 			var elite_chance = elite_rate * (0.5 + progress * 0.5)
 			
-			if roll < (cum_prob += shop_rate):
+			var threshold_shop = cum_prob + shop_rate
+			if roll < threshold_shop:
 				node["type"] = "shop"
 				node["shopId"] = sample_shop_by_difficulty(prng, profile, progress)
 				last_shop_index = index
-			elif roll < (cum_prob += elite_chance):
-				node["type"] = "elite"
-				node["roundId"] = sample_round_by_difficulty(prng, profile, progress, true)
-			elif roll < (cum_prob += treasure_chance):
-				node["type"] = "treasure"
-				node["eventId"] = 80001  # 宝箱事件ID占位
 			else:
-				node["type"] = "battle"
-				node["roundId"] = sample_round_by_difficulty(prng, profile, progress)
+				var threshold_elite = threshold_shop + elite_chance
+				if roll < threshold_elite:
+					node["type"] = "elite"
+					node["roundId"] = sample_round_by_difficulty(prng, profile, progress, true)
+				else:
+					var threshold_treasure = threshold_elite + treasure_chance
+					if roll < threshold_treasure:
+						node["type"] = "treasure"
+						node["eventId"] = 80001  # 宝箱事件ID占位
+					else:
+						node["type"] = "battle"
+						node["roundId"] = sample_round_by_difficulty(prng, profile, progress)
 		
 		# 抽样敌人池
 		if node.has("roundId"):

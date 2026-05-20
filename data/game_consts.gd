@@ -34,29 +34,29 @@ const AreaId_Shot: int = 3
 
 # 地图层节点类型
 const MapNodeType: Dictionary = {
-	BATTLE: "battle",
-	SHOP: "shop",
-	REST: "rest",
-	BOSS: "boss",
-	ELITE: "elite",
-	EVENT: "event",
-	TREASURE: "treasure",
+	"BATTLE": "battle",
+	"SHOP": "shop",
+	"REST": "rest",
+	"BOSS": "boss",
+	"ELITE": "elite",
+	"EVENT": "event",
+	"TREASURE": "treasure",
 }
 
 # 实体类型名称常量
 const EntityTypeName: Dictionary = {
-	ORDER_ENEMY: "OrderEnermy",
-	ORDER_SELF: "OrderSelf",
-	ELEMENT: "Element",
-	LAUNCHER: "Launcher",
-	BULLET: "Bullet",
-	SHOP: "Shop",
-	EVENT: "Event",
+	"ORDER_ENEMY": "OrderEnermy",
+	"ORDER_SELF": "OrderSelf",
+	"ELEMENT": "Element",
+	"LAUNCHER": "Launcher",
+	"BULLET": "Bullet",
+	"SHOP": "Shop",
+	"EVENT": "Event",
 }
 
 # Boss回合ID常量（程序化地图生成使用）
 const BossRoundId: Dictionary = {
-	BOSS_1: 50010,
-	BOSS_2: 50014,
-	FINAL_BOSS: 50015,
+	"BOSS_1": 50010,
+	"BOSS_2": 50014,
+	"FINAL_BOSS": 50015,
 }

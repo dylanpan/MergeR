@@ -54,7 +54,7 @@ static func _get_difficulty_config(round_meta: Dictionary, world: World = null) 
 	var round_id = round_meta.get("id", 0)
 	if world and world.config_service:
 		return world.config_service.get_difficulty_config(round_id)
-	var w = ClearRoguelikeManager.get_world()
+	var w = GdRoguelikeManager.get_world()
 	if w and w.config_service:
 		return w.config_service.get_difficulty_config(round_id)
 	return {}
@@ -62,7 +62,7 @@ static func _get_difficulty_config(round_meta: Dictionary, world: World = null) 
 static func _get_enemy_meta(enemy_id: int, world: World = null) -> Dictionary:
 	if world and world.config_service:
 		return world.config_service.get_enemy(enemy_id)
-	var w = ClearRoguelikeManager.get_world()
+	var w = GdRoguelikeManager.get_world()
 	if w and w.config_service:
 		return w.config_service.get_enemy(enemy_id)
 	return {}
