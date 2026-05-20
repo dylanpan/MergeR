@@ -32,5 +32,20 @@ func on_execute(context: Dictionary) -> void:
 	# 应用治疗 不超过最大HP
 	data_comp.data["hp"] = min(max_hp, data_comp.data.get("hp", 0) + actual_heal)
 	
-	# UI效果通知
-	GlobalEventBus.event_ui_update_self_hit.emit()
+	# 治疗效果事件通知 → UI显示治疗数字
+	GlobalEventBus.event_battle_update.emit({
+		"type": "heal_effect",
+		"entity_id": entity_id,
+		"amount": actual_heal
+	})
+	
+	# HP更新事件通知 → UI更新血条
+	GlobalEventBus.event_battle_update.emit({
+		"type": "hp_update",
+		"entity_id": entity_id,
+		"current_hp": data_comp.data["hp"],
+		"max_hp": max_hp
+	})
+
+# 技能注册
+SkillRegistry.register_skill("heal", HealSkill)

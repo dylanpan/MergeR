@@ -22,5 +22,16 @@ func on_execute(context: Dictionary) -> void:
 	if shield_comp:
 		shield_comp.add_shield(value, duration)
 	
-	# UI更新通知
+	# UI更新通知（向后兼容）
 	GlobalEventBus.event_ui_update_shield_absorb.emit(entity_id)
+	
+	# 护盾更新事件通知 → UI显示护盾值
+	GlobalEventBus.event_battle_update.emit({
+		"type": "shield_add",
+		"entity_id": entity_id,
+		"shield_hp": value,
+		"duration": duration
+	})
+
+# 技能注册
+SkillRegistry.register_skill("shield", ShieldSkill)

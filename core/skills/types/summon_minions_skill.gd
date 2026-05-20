@@ -43,5 +43,18 @@ func on_execute(context: Dictionary) -> void:
 		}
 		
 		var entity = OrderEnermyEntity.new(data)
-		WorldHelper.register_entity(entity)
+		# 注册实体到entity_manager
+		if _world and _world.entity_manager:
+			_world.entity_manager.register_entity(entity)
 		GlobalEventBus.event_on_enemy_spawn.emit(entity)
+	
+	# UI召唤特效通知
+	GlobalEventBus.event_battle_update.emit({
+		"type": "summon_effect",
+		"entity_id": entity_id,
+		"minion_id": minion_id,
+		"count": count
+	})
+
+# 技能注册
+SkillRegistry.register_skill("summon_minions", SummonMinionsSkill)

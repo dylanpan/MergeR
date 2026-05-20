@@ -21,6 +21,10 @@ static func debug(msg: String, extra = null) -> void:
 			text += " | " + str(extra)
 		print(text)
 
+# info 方法（log 的别名，保持与 JS 兼容）
+static func info(msg: String, extra = null) -> void:
+	log(msg, extra)
+
 static func log(msg: String, extra = null) -> void:
 	if _level <= LogLevel.INFO:
 		var text = _prefix + " [INFO] " + msg

@@ -18,13 +18,30 @@ func on_execute(context: Dictionary) -> void:
 		return
 	
 	# 获取所有敌方单位
-	var enemies = WorldHelper.get_enemies()
+	var world = GdRoguelikeManager.get_world()
+	if not world:
+		return
+	var enemies = world.entity_service.get_order_enemy()
 	
-	# 遍历对每个目标执行伤害
+	# 遍历对每个目标执行完整受击流程（含护盾/Buff检查）
 	for target in enemies:
-		var data_comp = target.get_component(ComponentNames.DATA) as DataComponent
-		if data_comp:
-			data_comp.data["hp"] = data_comp.data.get("hp", 0) - damage
+		if source_entity.has_method("apply_damage"):
+			source_entity.apply_damage(target, damage)
+		else:
+			# fallback: 直接修改HP
+			var data_comp = target.get_component(ComponentNames.DATA) as DataComponent
+			if data_comp:
+				data_comp.data["hp"] = data_comp.data.get("hp", 0) - damage
+	
+	var target_count = enemies.size()
 	
 	# UI攻击特效通知
-	GlobalEventBus.event_ui_update_enermy_hit.emit()
+	GlobalEventBus.event_battle_update.emit({
+		"type": "area_attack",
+		"entity_id": entity_id,
+		"damage": damage,
+		"target_count": target_count
+	})
+
+# 技能注册
+SkillRegistry.register_skill("area_attack", AreaAttackSkill)

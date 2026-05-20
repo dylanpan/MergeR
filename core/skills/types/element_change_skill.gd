@@ -22,5 +22,12 @@ func on_execute(context: Dictionary) -> void:
 	if elem_change:
 		elem_change.change_to(element_type, duration)
 	
-	# UI视觉效果通知
-	GlobalEventBus.event_ui_update_self_atk.emit()
+	# 元素变化事件通知 → UI更新元素显示
+	GlobalEventBus.event_battle_update.emit({
+		"type": "element_change",
+		"entity_id": entity_id,
+		"element_type": element_type
+	})
+
+# 技能注册
+SkillRegistry.register_skill("element_change", ElementChangeSkill)
