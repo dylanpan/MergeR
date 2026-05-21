@@ -87,7 +87,7 @@ func _on_item_buy(index: int) -> void:
 					get_node("lblFeedback").visible = false
 			)
 		else:
-			push_warning("ShopUI: 购买失败，index=" + str(index))
+			Logger.warn("ShopUI: 购买失败，index=" + str(index))
 
 func _on_refresh_click() -> void:
 	if not _current_shop_entity:

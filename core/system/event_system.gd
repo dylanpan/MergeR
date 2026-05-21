@@ -23,7 +23,7 @@ func update(dt: float) -> void:
 # 通过事件ID创建并打开事件（使用 EventFactory）
 func open_event(event_id: int) -> bool:
 	if _cur_event_entity:
-		push_warning("EventSystem: 当前已有打开的事件")
+		Logger.warn("EventSystem: 当前已有打开的事件")
 		return false
 	
 	var event_entity = EventFactory.create_event_entity(event_id)

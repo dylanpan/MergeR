@@ -16,7 +16,7 @@ static func get_skill_class(type_str: String):
 static func create_skill(type_str: String, skill_data: Dictionary = {}) -> BaseSkill:
 	var SkillClass = _registry.get(type_str, null)
 	if SkillClass == null:
-		push_error("Unknown skill type: ", type_str)
+		Logger.error("Unknown skill type: " + str(type_str))
 		return null
 	return SkillClass.new(skill_data)
 

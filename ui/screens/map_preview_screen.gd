@@ -15,7 +15,7 @@ func _ready() -> void:
 func on_opened(params = null) -> void:
 	var session = GdRoguelikeManager.game_session
 	if not session or not session.has_runtime_map():
-		push_warning("MapPreviewScreen: 没有运行时地图数据")
+		Logger.warn("MapPreviewScreen: 没有运行时地图数据")
 		return
 	
 	_runtime_map = session.get_runtime_map()

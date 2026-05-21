@@ -387,7 +387,7 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 	
 	# 后处理校验
 	if not MapModel.validate_map_model(map):
-		push_error("Map validation failed: generated map is invalid")
+		Logger.error("Map validation failed: generated map is invalid")
 	
 	return map
 
@@ -404,7 +404,7 @@ static func print_map_debug_log(map: MapModel) -> void:
 	
 	var stats = {"battle": 0, "elite": 0, "boss": 0, "shop": 0, "event": 0, "rest": 0, "treasure": 0}
 	
-	print("=== Map Generated | Difficulty: ", map.difficulty, " | Layers: ", map.layers.size(), " | Seed: ", map.seed)
+	Logger.info("=== Map Generated | Difficulty: " + str(map.difficulty) + " | Layers: " + str(map.layers.size()) + " | Seed: " + str(map.seed))
 	
 	for idx in range(map.layers.size()):
 		var node = map.layers[idx]
@@ -419,6 +419,6 @@ static func print_map_debug_log(map: MapModel) -> void:
 		if stats.has(t):
 			stats[t] += 1
 		
-		print("  ", (idx + 1), " | ", icon, " | round=", round_id, " | enemies=", enemies)
+		Logger.info("  " + str(idx + 1) + " | " + icon + " | round=" + str(round_id) + " | enemies=" + str(enemies))
 	
-	print("=== Stats: ", stats)
+	Logger.info("=== Stats: " + str(stats))
