@@ -5,9 +5,9 @@ var shield_value: float = 0.0
 
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.SHIELD
-	category = BuffCategory.VALUE_CACHE
-	trigger_timing = [BuffTriggerTiming.HURT]
+	type = BuffEnums.BuffTypes.SHIELD
+	category = BuffEnums.BuffCategory.VALUE_CACHE
+	trigger_timing = [BuffEnums.BuffTriggerTiming.HURT]
 	shield_value = buff_data.get("value", 0.0)
 
 func apply(context: BuffContext):

@@ -3,9 +3,9 @@ extends BaseBuff
 # 每回合额外+N步 — 回合开始时增加步数
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.STEP_PER_ROUND
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.ROUND_START]
+	type = BuffEnums.BuffTypes.STEP_PER_ROUND
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ROUND_START]
 	duration = -1
 
 func on_round_start(context: BuffContext):

@@ -3,9 +3,9 @@ extends BaseBuff
 # 元素属性伤害+15% — 伤害计算阶段，最终伤害 *= (1 + value)
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ELEM_DMG
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.DAMAGE_CALCULATE]
+	type = BuffEnums.BuffTypes.ELEM_DMG
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.DAMAGE_CALCULATE]
 	duration = -1
 
 func on_damage_calculate(context: BuffContext):

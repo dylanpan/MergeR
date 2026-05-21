@@ -5,9 +5,9 @@ var radius: int = 1
 
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.AREA_DMG
-	category = BuffCategory.STATE_FLAG
-	trigger_timing = [BuffTriggerTiming.DAMAGE_SETTLE]
+	type = BuffEnums.BuffTypes.AREA_DMG
+	category = BuffEnums.BuffCategory.STATE_FLAG
+	trigger_timing = [BuffEnums.BuffTriggerTiming.DAMAGE_SETTLE]
 	radius = buff_data.get("radius", 1)
 	duration = -1
 

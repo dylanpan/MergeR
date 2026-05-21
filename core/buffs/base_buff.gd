@@ -10,7 +10,7 @@ class_name BaseBuff
 # 唯一标识
 var id: String = ""
 # 效果类型
-var type: int = BuffTypes.NONE
+var type: int = BuffEnums.BuffTypes.NONE
 # 效果值
 var value: float = 0.0
 # 持续回合数 (-1 永久)
@@ -28,13 +28,13 @@ var is_expired: bool = false
 # 是否已激活
 var is_active: bool = false
 # 分类
-var category: int = BuffCategory.EMPTY
+var category: int = BuffEnums.BuffCategory.EMPTY
 # 触发时机列表
 var trigger_timing: Array = []
 
 func _init(buff_data: Dictionary = {}):
 	id = buff_data.get("id", "buff_" + str(Time.get_unix_time_from_system()) + "_" + str(randi() % 10000))
-	type = buff_data.get("type", BuffTypes.NONE)
+	type = buff_data.get("type", BuffEnums.BuffTypes.NONE)
 	value = buff_data.get("value", 0.0)
 	duration = buff_data.get("duration", -1)
 	remaining_duration = buff_data.get("remainingDuration", duration)
@@ -43,7 +43,7 @@ func _init(buff_data: Dictionary = {}):
 	source = buff_data.get("source", null)
 	is_expired = false
 	is_active = false
-	category = BuffCategory.EMPTY
+	category = BuffEnums.BuffCategory.EMPTY
 	trigger_timing = []
 
 func apply(context: BuffContext) -> void:

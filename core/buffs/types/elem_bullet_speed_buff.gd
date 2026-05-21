@@ -3,9 +3,9 @@ extends BaseBuff
 # 风属性子弹速度+10% — 子弹创建时，移动速度 *= (1 + value)
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ELEM_BULLET_SPEED
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.BULLET_CREATE]
+	type = BuffEnums.BuffTypes.ELEM_BULLET_SPEED
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.BULLET_CREATE]
 	duration = -1
 
 func on_bullet_create(context: BuffContext):

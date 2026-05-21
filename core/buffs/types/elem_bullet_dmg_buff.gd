@@ -3,9 +3,9 @@ extends BaseBuff
 # 属性子弹伤害+5% — 子弹创建时，子弹伤害 *= (1 + value)
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ELEM_BULLET_DMG
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.BULLET_CREATE]
+	type = BuffEnums.BuffTypes.ELEM_BULLET_DMG
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.BULLET_CREATE]
 	duration = -1
 
 func on_bullet_create(context: BuffContext):

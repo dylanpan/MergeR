@@ -2,8 +2,8 @@ extends BaseBuff
 
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.RANDOM_ELEM
-	trigger_timing = [BuffTriggerTiming.ON_APPLY]
+	type = BuffEnums.BuffTypes.RANDOM_ELEM
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ON_APPLY]
 
 func apply(context: BuffContext):
 	super.apply(context)

@@ -48,7 +48,7 @@ func add_buff(entity, buff_type_name: String, value: float = 0.0, duration: int 
 	if class_path == null:
 		return null
 	
-	var buff_type_enum = BUFF_TYPE_STRINGS.get(buff_type_name, BuffTypes.NONE)
+	var buff_type_enum = BuffEnums.BUFF_TYPE_STRINGS.get(buff_type_name, BuffEnums.BuffTypes.NONE)
 	
 	# 获取或创建实体 Buff 列表
 	var entity_id = entity.get_id() if entity.has_method("get_id") else str(entity.get_instance_id())
@@ -90,7 +90,7 @@ func remove_buff(entity, buff_type_name: String) -> void:
 	var entity_id = entity.get_id() if entity.has_method("get_id") else str(entity.get_instance_id())
 	var buff_list: Array = _entity_buffs.get(entity_id, [])
 	
-	var buff_type_enum = BUFF_TYPE_STRINGS.get(buff_type_name, BuffTypes.NONE)
+	var buff_type_enum = BuffEnums.BUFF_TYPE_STRINGS.get(buff_type_name, BuffEnums.BuffTypes.NONE)
 	
 	var context = BuffContext.new(entity, null, {})
 	for i in range(buff_list.size() - 1, -1, -1):
@@ -127,7 +127,7 @@ func get_buffs(entity, buff_type_name: String = "") -> Array:
 	var buff_list: Array = _entity_buffs.get(entity_id, [])
 	
 	if not buff_type_name.is_empty():
-		var buff_type_enum = BUFF_TYPE_STRINGS.get(buff_type_name, BuffTypes.NONE)
+		var buff_type_enum = BuffEnums.BUFF_TYPE_STRINGS.get(buff_type_name, BuffEnums.BuffTypes.NONE)
 		var filtered = []
 		for buff in buff_list:
 			if buff is BaseBuff and buff.type == buff_type_enum:
@@ -140,7 +140,7 @@ func get_buffs(entity, buff_type_name: String = "") -> Array:
 # 检查实体是否拥有指定 Buff
 # ============================================
 func has_buff(entity, buff_type_name: String) -> bool:
-	var buff_type_enum = BUFF_TYPE_STRINGS.get(buff_type_name, BuffTypes.NONE)
+	var buff_type_enum = BuffEnums.BUFF_TYPE_STRINGS.get(buff_type_name, BuffEnums.BuffTypes.NONE)
 	if not entity:
 		return false
 	var entity_id = entity.get_id() if entity.has_method("get_id") else str(entity.get_instance_id())
@@ -205,33 +205,33 @@ func trigger_timing(timing: int, context: BuffContext = null) -> void:
 				break
 			
 			match timing:
-				BuffTriggerTiming.ON_APPLY:
+				BuffEnums.BuffTriggerTiming.ON_APPLY:
 					buff.apply(context)
-				BuffTriggerTiming.ON_REMOVE:
+				BuffEnums.BuffTriggerTiming.ON_REMOVE:
 					buff.remove(context)
-				BuffTriggerTiming.ROUND_START:
+				BuffEnums.BuffTriggerTiming.ROUND_START:
 					buff.on_round_start(context)
-				BuffTriggerTiming.ROUND_END:
+				BuffEnums.BuffTriggerTiming.ROUND_END:
 					buff.on_round_end(context)
-				BuffTriggerTiming.ATTACK_CHECK:
+				BuffEnums.BuffTriggerTiming.ATTACK_CHECK:
 					buff.on_attack_check(context)
-				BuffTriggerTiming.DAMAGE_CALCULATE:
+				BuffEnums.BuffTriggerTiming.DAMAGE_CALCULATE:
 					buff.on_damage_calculate(context)
-				BuffTriggerTiming.CRIT_SETTLE:
+				BuffEnums.BuffTriggerTiming.CRIT_SETTLE:
 					buff.on_crit_settle(context)
-				BuffTriggerTiming.HURT:
+				BuffEnums.BuffTriggerTiming.HURT:
 					buff.on_hurt(context)
-				BuffTriggerTiming.BULLET_CREATE:
+				BuffEnums.BuffTriggerTiming.BULLET_CREATE:
 					buff.on_bullet_create(context)
-				BuffTriggerTiming.MOVE_CALCULATE:
+				BuffEnums.BuffTriggerTiming.MOVE_CALCULATE:
 					buff.on_move_calculate(context)
-				BuffTriggerTiming.ATTACK_END:
+				BuffEnums.BuffTriggerTiming.ATTACK_END:
 					buff.on_attack_end(context)
-				BuffTriggerTiming.DAMAGE_SETTLE:
+				BuffEnums.BuffTriggerTiming.DAMAGE_SETTLE:
 					buff.on_damage_settle(context)
-				BuffTriggerTiming.ACTION_PHASE:
+				BuffEnums.BuffTriggerTiming.ACTION_PHASE:
 					buff.on_action_phase(context)
-				BuffTriggerTiming.ELEMENT_CHECK:
+				BuffEnums.BuffTriggerTiming.ELEMENT_CHECK:
 					buff.on_element_check(context)
 		
 		# 移除已过期的 Buff
@@ -247,14 +247,14 @@ func trigger_timing(timing: int, context: BuffContext = null) -> void:
 # ============================================
 func on_round_start() -> void:
 	var context = BuffContext.new()
-	trigger_timing(BuffTriggerTiming.ROUND_START, context)
+	trigger_timing(BuffEnums.BuffTriggerTiming.ROUND_START, context)
 
 # ============================================
 # 回合结束事件
 # ============================================
 func on_round_end() -> void:
 	var context = BuffContext.new()
-	trigger_timing(BuffTriggerTiming.ROUND_END, context)
+	trigger_timing(BuffEnums.BuffTriggerTiming.ROUND_END, context)
 
 # ============================================
 # 获取调试信息
@@ -269,41 +269,3 @@ func get_debug_info() -> Dictionary:
 				json_list.append(buff.to_json())
 		result[entity_id] = json_list
 	return result
-
-# ============================================
-# Buff 类型名称到枚举的映射（便捷引用）
-# ============================================
-const BUFF_TYPE_STRINGS: Dictionary = {
-	"atk_up": BuffTypes.ATK_UP,
-	"def_up": BuffTypes.DEF_UP,
-	"atk_multi": BuffTypes.ATK_MULTI,
-	"def_multi": BuffTypes.DEF_MULTI,
-	"elem_dmg": BuffTypes.ELEM_DMG,
-	"dmg_reduce": BuffTypes.DMG_REDUCE,
-	"step_per_round": BuffTypes.STEP_PER_ROUND,
-	"double_act": BuffTypes.DOUBLE_ACT,
-	"shield": BuffTypes.SHIELD,
-	"heal": BuffTypes.HEAL,
-	"elem_bullet_dmg": BuffTypes.ELEM_BULLET_DMG,
-	"elem_bullet_speed": BuffTypes.ELEM_BULLET_SPEED,
-	"elem_bullet_pierce": BuffTypes.ELEM_BULLET_PIERCE,
-	"bullet_count": BuffTypes.BULLET_COUNT,
-	"crit_rate": BuffTypes.CRIT_RATE,
-	"crit_dmg": BuffTypes.CRIT_DMG,
-	"slow": BuffTypes.SLOW,
-	"combo_rate": BuffTypes.COMBO_RATE,
-	"area_dmg": BuffTypes.AREA_DMG,
-	"full_elem": BuffTypes.FULL_ELEM,
-	"def_ignore": BuffTypes.DEF_IGNORE,
-	"random_elem": BuffTypes.RANDOM_ELEM,
-	"step_bonus": BuffTypes.STEP_BONUS,
-	"elem_resist": BuffTypes.ELEM_RESIST,
-	"weakness_bonus": BuffTypes.WEAKNESS_BONUS,
-	"revive": BuffTypes.REVIVE,
-	"all_stats": BuffTypes.ALL_STATS,
-	"neutral_dmg_bonus": BuffTypes.NEUTRAL_DMG_BONUS,
-	"all_elem_bonus": BuffTypes.ALL_ELEM_BONUS,
-	"add_elem_slot": BuffTypes.ADD_ELEM_SLOT,
-	"full_elem_support": BuffTypes.FULL_ELEM_SUPPORT,
-	"none": BuffTypes.NONE,
-}

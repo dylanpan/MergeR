@@ -3,9 +3,9 @@ extends BaseBuff
 # 无视防御5% — 伤害计算时，目标防御 *= (1 - value)
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.DEF_IGNORE
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.DAMAGE_CALCULATE]
+	type = BuffEnums.BuffTypes.DEF_IGNORE
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.DAMAGE_CALCULATE]
 	duration = -1
 
 func on_damage_calculate(context: BuffContext):

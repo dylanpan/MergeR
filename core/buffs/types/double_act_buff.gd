@@ -3,9 +3,9 @@ extends BaseBuff
 # 双倍行动Buff — 行动阶段额外增加一次行动机会
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.DOUBLE_ACT
-	category = BuffCategory.TRIGGER_EFFECT
-	trigger_timing = [BuffTriggerTiming.ACTION_PHASE]
+	type = BuffEnums.BuffTypes.DOUBLE_ACT
+	category = BuffEnums.BuffCategory.TRIGGER_EFFECT
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ACTION_PHASE]
 	duration = -1
 
 func on_action_phase(context: BuffContext):

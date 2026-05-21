@@ -3,9 +3,9 @@ extends BaseBuff
 # 全属性子弹伤害加成Buff — 提升所有属性子弹伤害
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ALL_ELEM_BONUS
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.BULLET_CREATE]
+	type = BuffEnums.BuffTypes.ALL_ELEM_BONUS
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.BULLET_CREATE]
 	duration = -1
 
 func on_bullet_create(context: BuffContext):

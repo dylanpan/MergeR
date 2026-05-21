@@ -3,9 +3,9 @@ extends BaseBuff
 # 即时步数奖励Buff — 使用时立即获得额外步数
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.STEP_BONUS
-	category = BuffCategory.INSTANT_EFFECT
-	trigger_timing = [BuffTriggerTiming.ON_APPLY]
+	type = BuffEnums.BuffTypes.STEP_BONUS
+	category = BuffEnums.BuffCategory.INSTANT_EFFECT
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ON_APPLY]
 	duration = 0
 
 func apply(context: BuffContext):

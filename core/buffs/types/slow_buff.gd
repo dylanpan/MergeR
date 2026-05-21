@@ -3,9 +3,9 @@ extends BaseBuff
 # 减速效果 — 移动计算时，速度 *= (1 - value)
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.SLOW
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.MOVE_CALCULATE]
+	type = BuffEnums.BuffTypes.SLOW
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.MOVE_CALCULATE]
 	duration = -1
 
 func on_move_calculate(context: BuffContext):

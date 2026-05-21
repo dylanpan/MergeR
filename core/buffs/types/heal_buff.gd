@@ -5,9 +5,9 @@ var is_instant: bool = true
 
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.HEAL
-	category = BuffCategory.INSTANT_EFFECT
-	trigger_timing = [BuffTriggerTiming.ON_APPLY, BuffTriggerTiming.ROUND_END]
+	type = BuffEnums.BuffTypes.HEAL
+	category = BuffEnums.BuffCategory.INSTANT_EFFECT
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ON_APPLY, BuffEnums.BuffTriggerTiming.ROUND_END]
 	is_instant = buff_data.get("isInstant", true)
 
 func apply(context: BuffContext):

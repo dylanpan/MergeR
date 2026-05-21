@@ -3,9 +3,9 @@ extends BaseBuff
 # 连击概率+15% — 子弹创建时，有概率额外增加1颗子弹
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.COMBO_RATE
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.BULLET_CREATE]
+	type = BuffEnums.BuffTypes.COMBO_RATE
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.BULLET_CREATE]
 	duration = -1
 
 func on_bullet_create(context: BuffContext):

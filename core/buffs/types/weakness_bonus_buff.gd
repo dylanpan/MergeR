@@ -3,9 +3,9 @@ extends BaseBuff
 # 克制伤害加成Buff — 克制目标时伤害额外提升
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.WEAKNESS_BONUS
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.DAMAGE_CALCULATE]
+	type = BuffEnums.BuffTypes.WEAKNESS_BONUS
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.DAMAGE_CALCULATE]
 	duration = -1
 
 func on_damage_calculate(context: BuffContext):

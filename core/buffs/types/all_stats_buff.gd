@@ -3,9 +3,9 @@ extends BaseBuff
 # 全属性提升Buff — 所有基础属性按比例提升
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ALL_STATS
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.ON_APPLY, BuffTriggerTiming.ON_REMOVE]
+	type = BuffEnums.BuffTypes.ALL_STATS
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.ON_APPLY, BuffEnums.BuffTriggerTiming.ON_REMOVE]
 	duration = -1
 
 func apply(context: BuffContext):

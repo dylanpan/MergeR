@@ -3,9 +3,9 @@ extends BaseBuff
 # 元素抗性Buff — 减免所有元素伤害
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ELEM_RESIST
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.HURT]
+	type = BuffEnums.BuffTypes.ELEM_RESIST
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.HURT]
 	duration = -1
 
 func on_hurt(context: BuffContext):

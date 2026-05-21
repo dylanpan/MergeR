@@ -3,9 +3,9 @@ extends BaseBuff
 # 攻击倍率Buff — 所有伤害按比例提升
 func _init(buff_data: Dictionary = {}):
 	super(buff_data)
-	type = BuffTypes.ATK_MULTI
-	category = BuffCategory.ATTRIBUTE_MODIFIER
-	trigger_timing = [BuffTriggerTiming.DAMAGE_CALCULATE]
+	type = BuffEnums.BuffTypes.ATK_MULTI
+	category = BuffEnums.BuffCategory.ATTRIBUTE_MODIFIER
+	trigger_timing = [BuffEnums.BuffTriggerTiming.DAMAGE_CALCULATE]
 	duration = -1
 
 func on_damage_calculate(context: BuffContext):
