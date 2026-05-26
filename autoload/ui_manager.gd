@@ -125,12 +125,12 @@ func preload_ui(ui_name_or_path: String) -> Resource:
 	# 解析路径
 	var path = _resolve_ui_path(ui_name_or_path)
 	if path.is_empty():
-		Logger.error("UIManager: 找不到 UI 路径 - " + str(ui_name_or_path))
+		GDLogger.error("UIManager: 找不到 UI 路径 - " + str(ui_name_or_path))
 		return null
 	
 	var resource = load(path)
 	if resource == null:
-		Logger.error("UIManager: 无法加载资源 - " + str(path))
+		GDLogger.error("UIManager: 无法加载资源 - " + str(path))
 		return null
 	
 	loaded_scenes[ui_name_or_path] = resource
@@ -142,21 +142,21 @@ func _instantiate_ui(resource: Resource) -> UIBase:
 		var instance = resource.instantiate()
 		if instance is UIBase:
 			return instance
-		Logger.error("UIManager: 场景根节点不是 UIBase - " + str(resource.resource_path))
+		GDLogger.error("UIManager: 场景根节点不是 UIBase - " + str(resource.resource_path))
 		instance.queue_free()
 		return null
 	elif resource is Script:
 		if not resource is GDScript:
-			Logger.error("UIManager: 不支持的脚本类型 - " + str(resource.resource_path))
+			GDLogger.error("UIManager: 不支持的脚本类型 - " + str(resource.resource_path))
 			return null
 		var instance = resource.new()
 		if instance is UIBase:
 			return instance
-		Logger.error("UIManager: 脚本实例不是 UIBase - " + str(resource.resource_path))
+		GDLogger.error("UIManager: 脚本实例不是 UIBase - " + str(resource.resource_path))
 		instance.queue_free()
 		return null
 	else:
-		Logger.error("UIManager: 不支持的资源类型 - " + str(resource.resource_path))
+		GDLogger.error("UIManager: 不支持的资源类型 - " + str(resource.resource_path))
 		return null
 
 
@@ -173,7 +173,7 @@ func open_ui(ui_name: String, params = null, layer_override: String = "") -> UIB
 	var target_layer_name = layer_override if layer_override != "" else ui_instance.layer_name
 	var layer = layers.get(target_layer_name)
 	if not layer:
-		Logger.error("UIManager: 未找到UI层 - " + str(target_layer_name))
+		GDLogger.error("UIManager: 未找到UI层 - " + str(target_layer_name))
 		ui_instance.queue_free()
 		return null
 	
@@ -196,7 +196,7 @@ func close_ui(ui_name: String, return_data = null):
 				_do_close_ui(layer, ui, return_data)
 				return return_data
 	
-	Logger.warn("UIManager: 未找到打开的UI - " + str(ui_name))
+	GDLogger.warn("UIManager: 未找到打开的UI - " + str(ui_name))
 	return null
 
 

@@ -22,12 +22,12 @@ static func create_event_entity(event_id: int, meta: Dictionary = {}) -> BaseEve
 	
 	var factory = _event_registry.get(event_id, null)
 	if not factory:
-		Logger.warn("EventFactory: 未注册的事件ID " + str(event_id))
+		GDLogger.warn("EventFactory: 未注册的事件ID " + str(event_id))
 		return null
 	
 	var entity = factory.call(event_id) as BaseEventEntity
 	if not entity:
-		Logger.error("EventFactory: 创建事件实体失败 ID=" + str(event_id))
+		GDLogger.error("EventFactory: 创建事件实体失败 ID=" + str(event_id))
 		return null
 	
 	# 注入元数据配置：若未提供 meta，从 MetaConsts 自动读取
@@ -40,10 +40,10 @@ static func create_event_entity(event_id: int, meta: Dictionary = {}) -> BaseEve
 static func register_event_entity(event_id: int, class_ref) -> void:
 	# 通过类引用的 new 方法动态创建实例
 	if class_ref == null:
-		Logger.warn("EventFactory.register_event_entity: class_ref 为空")
+		GDLogger.warn("EventFactory.register_event_entity: class_ref 为空")
 		return
 	if _event_registry.has(event_id):
-		Logger.warn("EventFactory.register_event_entity: 事件ID " + str(event_id) + " 已被注册，将被覆盖")
+		GDLogger.warn("EventFactory.register_event_entity: 事件ID " + str(event_id) + " 已被注册，将被覆盖")
 	
 	_event_registry[event_id] = func(id): return class_ref.new(id)
-	Logger.info("EventFactory: 注册事件 ID=" + str(event_id) + " 成功")
+	GDLogger.info("EventFactory: 注册事件 ID=" + str(event_id) + " 成功")

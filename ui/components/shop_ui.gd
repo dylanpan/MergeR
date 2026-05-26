@@ -20,7 +20,7 @@ func _on_shop_open(args: Dictionary) -> void:
 	var shop_data = args.get("shopData", {})
 	
 	# 创建商店实体
-	_current_shop_entity = ShopEntity.new(shop_id, self)
+	_current_shop_entity = ShopEntity.new(shop_data)
 	_current_shop_entity.init(shop_data)
 	
 	# 显示商店UI
@@ -87,7 +87,7 @@ func _on_item_buy(index: int) -> void:
 					get_node("lblFeedback").visible = false
 			)
 		else:
-			Logger.warn("ShopUI: 购买失败，index=" + str(index))
+			GDLogger.warn("ShopUI: 购买失败，index=" + str(index))
 
 func _on_refresh_click() -> void:
 	if not _current_shop_entity:

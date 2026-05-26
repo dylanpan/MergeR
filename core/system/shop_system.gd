@@ -39,14 +39,15 @@ func buy_item(entity, item_index: int) -> bool:
 	GlobalEventBus.event_shop_buy.emit(item.get("id", 0), item_index)
 	return true
 
-func refresh_shop(entity) -> void:
+func refresh_shop(entity) -> bool:
 	if not entity:
-		return
+		return false
 	var shop_comp = entity.get_component(ComponentNames.SHOP) as ShopComponent
 	if not shop_comp:
-		return
+		return false
 	shop_comp.refresh([])
 	GlobalEventBus.event_shop_refresh.emit(shop_comp.items, shop_comp.refresh_count)
+	return true
 
 func close_shop() -> void:
 	GlobalEventBus.event_shop_close.emit()

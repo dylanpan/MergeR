@@ -13,4 +13,4 @@ func _ready() -> void:
 			"difficulty": 5
 		})
 	else:
-		Logger.error("UIManager 未就绪")
+		GDLogger.error("UIManager 未就绪")

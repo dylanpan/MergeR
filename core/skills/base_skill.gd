@@ -18,7 +18,7 @@ func execute(context: Dictionary = {}) -> void:
 	on_execute(context)
 
 func on_execute(context: Dictionary) -> void:
-	Logger.error("Skill must implement on_execute() method")
+	GDLogger.error("Skill must implement on_execute() method")
 
 func bind_entity(p_entity_id: String) -> void:
 	entity_id = p_entity_id

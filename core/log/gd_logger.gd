@@ -2,9 +2,11 @@ extends Node
 
 # ============================================================
 # 日志工具（替代 ClearRoguelikeLogger.js）
+# 注意：Godot 4.4+ 内置了 error/info/warn/log/err 等方法，
+#       因此 static 方法统一加 log_ 前缀避免冲突。
 # ============================================================
 
-class_name Logger
+class_name GDLogger
 
 enum LogLevel { DEBUG, INFO, WARN, ERROR }
 
@@ -21,11 +23,7 @@ static func debug(msg: String, extra = null) -> void:
 			text += " | " + str(extra)
 		print(text)
 
-# info 方法（log 的别名，保持与 JS 兼容）
 static func info(msg: String, extra = null) -> void:
-	log(msg, extra)
-
-static func log(msg: String, extra = null) -> void:
 	if _level <= LogLevel.INFO:
 		var text = _prefix + " [INFO] " + msg
 		if extra != null:
@@ -45,3 +43,4 @@ static func error(msg: String, extra = null) -> void:
 		if extra != null:
 			text += " | " + str(extra)
 		push_error(text)
+

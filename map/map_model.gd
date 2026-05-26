@@ -27,96 +27,96 @@ static func create_empty_map(p_difficulty: int, p_seed: int) -> MapModel:
 
 static func validate_map_model(map_obj) -> bool:
 	if map_obj == null:
-		Logger.error("validate_map_model: map is null")
+		GDLogger.error("validate_map_model: map is null")
 		return false
 	
 	# 验证 version
 	if not map_obj.has("version") or map_obj.version != 1:
-		Logger.error("validate_map_model: invalid version")
+		GDLogger.error("validate_map_model: invalid version")
 		return false
 	
 	# 验证 seed >= 0
 	if not map_obj.has("seed") or map_obj.seed < 0:
-		Logger.error("validate_map_model: invalid seed")
+		GDLogger.error("validate_map_model: invalid seed")
 		return false
 	
 	# 验证 difficulty 1~10
 	if not map_obj.has("difficulty") or map_obj.difficulty < 1 or map_obj.difficulty > 10:
-		Logger.error("validate_map_model: invalid difficulty (must be 1-10)")
+		GDLogger.error("validate_map_model: invalid difficulty (must be 1-10)")
 		return false
 	
 	# 验证 layers 是数组且非空
 	if not map_obj.has("layers") or typeof(map_obj.layers) != TYPE_ARRAY or map_obj.layers.is_empty():
-		Logger.error("validate_map_model: layers must be non-empty array")
+		GDLogger.error("validate_map_model: layers must be non-empty array")
 		return false
 	
 	# 逐节点校验
 	for i in range(map_obj.layers.size()):
 		var node = map_obj.layers[i]
 		if not validate_map_node(node):
-			Logger.error("validate_map_model: node at index " + str(i) + " is invalid")
+			GDLogger.error("validate_map_model: node at index " + str(i) + " is invalid")
 			return false
 	
 	# 约束：首节点必为 BATTLE
 	if map_obj.layers.size() > 0:
 		var first_type = map_obj.layers[0].get("type", "")
 		if first_type != "battle":
-			Logger.error("validate_map_model: first node must be BATTLE, got " + first_type)
+			GDLogger.error("validate_map_model: first node must be BATTLE, got " + first_type)
 			return false
 	
 	# 约束：末节点必为 BOSS
 	if map_obj.layers.size() > 0:
 		var last_type = map_obj.layers[-1].get("type", "")
 		if last_type != "boss":
-			Logger.error("validate_map_model: last node must be BOSS, got " + last_type)
+			GDLogger.error("validate_map_model: last node must be BOSS, got " + last_type)
 			return false
 	
 	return true
 
 static func validate_map_node(node: Dictionary) -> bool:
 	if node.is_empty():
-		Logger.error("validate_map_node: node is empty")
+		GDLogger.error("validate_map_node: node is empty")
 		return false
 	if not node.has("id") or not node.has("type"):
-		Logger.error("validate_map_node: missing id or type")
+		GDLogger.error("validate_map_node: missing id or type")
 		return false
 	if not node.has("index"):
-		Logger.error("validate_map_node: missing index")
+		GDLogger.error("validate_map_node: missing index")
 		return false
 	
 	# 验证 id >= 0
 	var node_id = node.get("id", -1)
 	if node_id < 0:
-		Logger.error("validate_map_node: id must be >= 0")
+		GDLogger.error("validate_map_node: id must be >= 0")
 		return false
 	
 	# 根据 type 验证对应字段
 	var node_type = node.get("type", "")
 	var valid_types = ["battle", "elite", "boss", "shop", "event", "rest", "treasure"]
 	if not valid_types.has(node_type):
-		Logger.error("validate_map_node: invalid type '" + node_type + "'")
+		GDLogger.error("validate_map_node: invalid type '" + node_type + "'")
 		return false
 	
 	match node_type:
 		"battle", "elite":
 			if not node.has("roundId"):
-				Logger.error("validate_map_node: " + node_type + " node missing roundId")
+				GDLogger.error("validate_map_node: " + node_type + " node missing roundId")
 				return false
 		"boss":
 			if not node.has("roundId"):
-				Logger.error("validate_map_node: boss node missing roundId")
+				GDLogger.error("validate_map_node: boss node missing roundId")
 				return false
 		"shop":
 			if not node.has("shopId"):
-				Logger.error("validate_map_node: shop node missing shopId")
+				GDLogger.error("validate_map_node: shop node missing shopId")
 				return false
 		"event":
 			if not node.has("eventId"):
-				Logger.error("validate_map_node: event node missing eventId")
+				GDLogger.error("validate_map_node: event node missing eventId")
 				return false
 		"rest":
 			if not node.has("restId"):
-				Logger.error("validate_map_node: rest node missing restId")
+				GDLogger.error("validate_map_node: rest node missing restId")
 				return false
 	
 	return true
@@ -133,7 +133,7 @@ static func deserialize_from_json(json_data: Dictionary) -> MapModel:
 	
 	# 验证反序列化结果
 	if not validate_map_model(map_obj):
-		Logger.error("deserialize_from_json: map validation failed")
+		GDLogger.error("deserialize_from_json: map validation failed")
 		return null
 	
 	return map_obj

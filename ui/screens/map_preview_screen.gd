@@ -15,7 +15,7 @@ func _ready() -> void:
 func on_opened(params = null) -> void:
 	var session = GdRoguelikeManager.game_session
 	if not session or not session.has_runtime_map():
-		Logger.warn("MapPreviewScreen: 没有运行时地图数据")
+		GDLogger.warn("MapPreviewScreen: 没有运行时地图数据")
 		return
 	
 	_runtime_map = session.get_runtime_map()
@@ -42,10 +42,11 @@ func open(param: Dictionary = {}) -> void:
 	_render_map()
 	visible = true
 
-func close() -> void:
+func _on_click_btn_close() -> void:
 	_node_components.clear()
 	_runtime_map = null
 	visible = false
+	close(false)
 
 func _init_ui() -> void:
 	if not has_node("nodeDialog"):
@@ -70,9 +71,9 @@ func _on_btn_back() -> void:
 	if is_inside_tree():
 		var parent_layer = get_parent()
 		if parent_layer is CanvasLayer:
-			close()
+			_on_click_btn_close()
 			return
-	close()
+	_on_click_btn_close()
 
 func _render_map() -> void:
 	if not _runtime_map or not has_node("nodeDialog"):
