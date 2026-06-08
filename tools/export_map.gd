@@ -8,17 +8,22 @@
 
 extends SceneTree
 
-# 先加载 Logger，注册其 class_name
-const _GDLogger = preload("res://core/log/gd_logger.gd")
+# 只加载非 autoload 的依赖脚本（避免触发项目 autoload 的运行时初始化）
 const _MetaConsts = preload("res://data/meta_consts.gd")
 const _GameConsts = preload("res://data/game_consts.gd")
-# 只加载非 autoload 的依赖脚本（避免触发项目 autoload 的运行时初始化）
+const _GDLogger = preload("res://core/log/gd_logger.gd")
 const _MapModel = preload("res://map/map_model.gd")
 const _MapGenerator = preload("res://map/map_generator.gd")
 const _Prng = preload("res://map/prng.gd")
 const _ConfigService = preload("res://core/services/config_service.gd")
 
 func _init():
+	# var meta_consts_instance = load("res://data/meta_consts.gd").new()
+	# Engine.register_singleton("MetaConsts", meta_consts_instance)
+
+	# var game_consts_instance = load("res://data/game_consts.gd").new()
+	# Engine.register_singleton("GameConsts", game_consts_instance)
+
 	# 解析命令行参数
 	var args = OS.get_cmdline_args()
 	var difficulty = 5

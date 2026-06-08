@@ -14,6 +14,7 @@ var created_at: int = 0
 var layers: Array = []  # Array of Dictionary nodes
 var profile: Dictionary = {}
 var game_rounds: Dictionary = {}  # roundId -> round data
+var game_levels: Dictionary = {}  # roundId -> round data
 
 static func create_empty_map(p_difficulty: int, p_seed: int) -> MapModel:
 	var map = MapModel.new()
@@ -31,22 +32,22 @@ static func validate_map_model(map_obj) -> bool:
 		return false
 	
 	# 验证 version
-	if not map_obj.has("version") or map_obj.version != 1:
+	if not map_obj.get("version") or map_obj.version != 1:
 		GDLogger.error("validate_map_model: invalid version")
 		return false
 	
 	# 验证 seed >= 0
-	if not map_obj.has("seed") or map_obj.seed < 0:
+	if not map_obj.get("seed") or map_obj.seed < 0:
 		GDLogger.error("validate_map_model: invalid seed")
 		return false
 	
 	# 验证 difficulty 1~10
-	if not map_obj.has("difficulty") or map_obj.difficulty < 1 or map_obj.difficulty > 10:
+	if not map_obj.get("difficulty") or map_obj.difficulty < 1 or map_obj.difficulty > 10:
 		GDLogger.error("validate_map_model: invalid difficulty (must be 1-10)")
 		return false
 	
 	# 验证 layers 是数组且非空
-	if not map_obj.has("layers") or typeof(map_obj.layers) != TYPE_ARRAY or map_obj.layers.is_empty():
+	if not map_obj.get("layers") or typeof(map_obj.layers) != TYPE_ARRAY or map_obj.layers.is_empty():
 		GDLogger.error("validate_map_model: layers must be non-empty array")
 		return false
 	

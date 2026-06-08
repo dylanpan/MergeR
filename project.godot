@@ -19,8 +19,6 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-MetaConsts="*res://data/meta_consts.gd"
-GameConsts="*res://data/game_consts.gd"
 GlobalEventBus="*res://autoload/global_event_bus.gd"
 GdRoguelikeManager="*res://autoload/gd_roguelike_manager.gd"
 UIManager="*res://autoload/ui_manager.gd"
