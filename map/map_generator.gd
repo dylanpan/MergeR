@@ -129,15 +129,18 @@ static func generate_game_levels(profile: Dictionary, game_rounds: Dictionary, p
 			var shop_rate = profile.get("shopRate", 0.12)
 			
 			if node_type_roll < event_rate:
-				# 事件节点（使用可用的事件ID候选，若meta无配置则fallback为战斗）
-				level_data["events"] = [80001]
+				# 事件节点（从配置表随机抽取）
+				var event_id = sample_event_by_difficulty(prng, profile, progress, true)
+				level_data["events"] = [event_id]
 			elif node_type_roll < event_rate + rest_rate:
-				# 休息节点
-				level_data["rests"] = [80001]
+				# 休息节点（从配置表随机抽取）
+				var rest_id = sample_rest_by_difficulty(prng, profile, progress)
+				level_data["rests"] = [rest_id]
 			elif node_type_roll < event_rate + rest_rate + shop_rate:
 				# 商店节点（仅layer_idx > 2生效，否则fallback战斗）
 				if layer_idx > 2:
-					level_data["shops"] = [60001]
+					var shop_id = sample_shop_by_difficulty(prng, profile, progress)
+					level_data["shops"] = [shop_id]
 				else:
 					level_data["rounds"] = rounds
 			else:
@@ -274,7 +277,7 @@ static func sample_round_by_difficulty(prng: Prng, profile: Dictionary, progress
 	return selected.get("id", 50001) if selected else 50001
 
 static func sample_shop_by_difficulty(prng: Prng, profile: Dictionary, progress: float) -> int:
-	# 简化版：根据进度返回shop类型（GD暂无完整gameShops配置）
+	# 从 MetaConsts.gameShops 根据进度抽取（以 tier 字段为依据）
 	var shop_tier = 1
 	if progress < 0.33:
 		shop_tier = 1
@@ -283,8 +286,61 @@ static func sample_shop_by_difficulty(prng: Prng, profile: Dictionary, progress:
 	else:
 		shop_tier = 3
 	
-	# 使用 tier 决定 shopId 范围（GD集成后由具体配置决定）
+	# 在对应 tier 的 shops 中随机选一个
+	var candidates = []
+	for sid in MetaConsts.gameShops.keys():
+		var shop = MetaConsts.gameShops[sid]
+		if shop.get("tier", 1) == shop_tier:
+			candidates.append(sid)
+	
+	if not candidates.is_empty():
+		return prng.random_choice(candidates)
 	return 60000 + shop_tier
+
+static func sample_event_by_difficulty(prng: Prng, profile: Dictionary, progress: float, exclude_start: bool = true) -> int:
+	# 从 MetaConsts.gameEvents 根据进度抽取
+	var min_tier = max(1, floor(progress * 4))
+	var max_tier = min(4, min_tier + 1)
+	
+	var candidates = []
+	for eid in MetaConsts.gameEvents.keys():
+		var event = MetaConsts.gameEvents[eid]
+		var tier = event.get("tier", 1)
+		if exclude_start and event.get("type", "") == "start_choice":
+			continue  # 排除初始祝福
+		if tier >= min_tier and tier <= max_tier:
+			candidates.append(eid)
+	
+	if candidates.is_empty():
+		# fallback: 排除 start_choice 后取所有
+		for eid in MetaConsts.gameEvents.keys():
+			var event = MetaConsts.gameEvents[eid]
+			if exclude_start and event.get("type", "") == "start_choice":
+				continue
+			candidates.append(eid)
+	
+	if not candidates.is_empty():
+		return prng.random_choice(candidates)
+	return 70001  # 终极fallback
+
+static func sample_rest_by_difficulty(prng: Prng, profile: Dictionary, progress: float) -> int:
+	# 从 MetaConsts.gameRests 根据进度抽取
+	var min_tier = max(1, floor(progress * 3))
+	var max_tier = min(3, min_tier + 1)
+	
+	var candidates = []
+	for rid in MetaConsts.gameRests.keys():
+		var rest = MetaConsts.gameRests[rid]
+		var tier = rest.get("tier", 1)
+		if tier >= min_tier and tier <= max_tier:
+			candidates.append(rid)
+	
+	if candidates.is_empty():
+		candidates = MetaConsts.gameRests.keys()
+	
+	if not candidates.is_empty():
+		return prng.random_choice(candidates)
+	return 80001
 
 static func generate_map(difficulty: int, seed: int) -> MapModel:
 	var prng = Prng.new(seed)
@@ -392,7 +448,7 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 						var threshold_treasure = threshold_elite + treasure_chance
 						if roll < threshold_treasure:
 							node["type"] = "treasure"
-							node["eventId"] = 80001  # 宝箱事件ID占位
+							node["eventId"] = 70001  # 神秘宝箱事件
 							node_counts["treasure"] += 1
 						else:
 							node["type"] = "battle"
@@ -445,17 +501,19 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 						node_ref["roundId"] = sample_round_by_difficulty(prng, profile, p, true)
 					"treasure":
 						node_ref["type"] = "treasure"
-						node_ref["eventId"] = 80001
+						node_ref["eventId"] = 70001
 						node_ref.erase("roundId")
 						node_ref.erase("enemies")
 					"event":
 						node_ref["type"] = "event"
-						node_ref["eventId"] = 70001
+						var eid = sample_event_by_difficulty(prng, profile, float(node_ref.get("level", 1)) / float(total_layers), true)
+						node_ref["eventId"] = eid
 						node_ref.erase("roundId")
 						node_ref.erase("enemies")
 					"rest":
 						node_ref["type"] = "rest"
-						node_ref["restId"] = 80001
+						var rid = sample_rest_by_difficulty(prng, profile, float(node_ref.get("level", 1)) / float(total_layers))
+						node_ref["restId"] = rid
 						node_ref.erase("roundId")
 						node_ref.erase("enemies")
 				node_counts[t] += 1
