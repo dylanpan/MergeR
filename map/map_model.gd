@@ -58,11 +58,11 @@ static func validate_map_model(map_obj) -> bool:
 			GDLogger.error("validate_map_model: node at index " + str(i) + " is invalid")
 			return false
 	
-	# 约束：首节点必为 BATTLE
+	# 约束：首节点必为 EVENT (初始祝福)
 	if map_obj.layers.size() > 0:
 		var first_type = map_obj.layers[0].get("type", "")
-		if first_type != "battle":
-			GDLogger.error("validate_map_model: first node must be BATTLE, got " + first_type)
+		if first_type != "event":
+			GDLogger.error("validate_map_model: first node must be EVENT, got " + first_type)
 			return false
 	
 	# 约束：末节点必为 BOSS

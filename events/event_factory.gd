@@ -15,6 +15,7 @@ static func _static_init() -> void:
 	_event_registry[70001] = func(id): return TreasureChestEvent.new(id)
 	_event_registry[70002] = func(id): return HealFountainEvent.new(id)
 	_event_registry[70003] = func(id): return RandomBuffEvent.new(id)
+	_event_registry[70004] = func(id): return StartChoiceEvent.new(id)
 
 static func create_event_entity(event_id: int, meta: Dictionary = {}) -> BaseEventEntity:
 	if _event_registry.is_empty():

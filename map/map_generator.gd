@@ -295,16 +295,20 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 	map.game_rounds = generate_game_rounds(profile, prng)
 	map.game_levels = generate_game_levels(profile, map.game_rounds, prng)
 	
+	# 获取节点数量限制
+	var node_limits = profile.get("nodeLimits", {})
+	var node_counts = {"battle": 0, "elite": 0, "boss": 0, "shop": 0, "event": 0, "rest": 0, "treasure": 0}
+	var last_shop_index = -10
+	var total_layers = profile.get("layerCount", 7)
+	
 	# 为每个真实关卡节点生成节点数据
 	var level_ids = map.game_levels.keys()
 	level_ids.sort()
 	
-	var last_shop_index = -10
-	
 	for index in range(level_ids.size()):
 		var level_id = level_ids[index]
 		var level = map.game_levels[level_id]
-		var progress = float(level.get("level", 1)) / float(profile.get("layerCount", 7))
+		var progress = float(level.get("level", 1)) / float(total_layers)
 		
 		var node = {
 			"id": level_id,
@@ -312,62 +316,88 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 			"level": level.get("level", 1)
 		}
 		
-		# 首层固定为简单战斗
+		# 首层固定为初始祝福事件 (70004)
 		if level.get("level", 1) == 1:
-			node["type"] = "battle"
-			node["roundId"] = sample_round_by_difficulty(prng, profile, 0.0)
+			node["type"] = "event"
+			node["eventId"] = 70004
+			node_counts["event"] += 1
 		# 末层固定为最终Boss
-		elif level.get("level", 1) == profile.get("layerCount", 7):
+		elif level.get("level", 1) == total_layers:
 			node["type"] = "boss"
 			node["roundId"] = 50015  # 最终Boss round
-		# 优先处理已有事件节点
-		elif level.get("events", []).size() > 0:
-			node["type"] = "event"
-			node["eventId"] = level["events"][0]
-		# 优先处理已有休息节点
-		elif level.get("rests", []).size() > 0:
-			node["type"] = "rest"
-			node["restId"] = level["rests"][0]
-		# 优先处理已有商店节点
-		elif level.get("shops", []).size() > 0:
-			node["type"] = "shop"
-			node["shopId"] = level["shops"][0]
-			last_shop_index = index
+			node_counts["boss"] += 1
 		else:
-			# 战斗节点（含精英和宝箱）
-			var shop_rate = profile.get("shopRate", 0.12)
-			var elite_rate = profile.get("eliteRate", 0.15)
-			var distance_from_last_shop = index - last_shop_index
+			var assigned = false
 			
-			if distance_from_last_shop < 3:
-				shop_rate = 0.0
+			# 辅助函数：检查某类型是否已达max
+			var can_add = func(t: String) -> bool:
+				var limits = node_limits.get(t, {})
+				var max_val = limits.get("max", 999)
+				return node_counts.get(t, 0) < max_val
 			
-			var roll = prng.next_float()
-			var cum_prob = 0.0
+			# 优先处理已有事件节点
+			if not assigned and level.get("events", []).size() > 0 and can_add.call("event"):
+				node["type"] = "event"
+				node["eventId"] = level["events"][0]
+				node_counts["event"] += 1
+				assigned = true
 			
-			# 宝箱概率
-			var treasure_chance = 0.05 * (0.5 + progress * 0.5)
-			# 精英概率
-			var elite_chance = elite_rate * (0.5 + progress * 0.5)
+			# 优先处理已有休息节点
+			if not assigned and level.get("rests", []).size() > 0 and can_add.call("rest"):
+				node["type"] = "rest"
+				node["restId"] = level["rests"][0]
+				node_counts["rest"] += 1
+				assigned = true
 			
-			var threshold_shop = cum_prob + shop_rate
-			if roll < threshold_shop:
+			# 优先处理已有商店节点
+			if not assigned and level.get("shops", []).size() > 0 and can_add.call("shop"):
 				node["type"] = "shop"
-				node["shopId"] = sample_shop_by_difficulty(prng, profile, progress)
+				node["shopId"] = level["shops"][0]
+				node_counts["shop"] += 1
 				last_shop_index = index
-			else:
-				var threshold_elite = threshold_shop + elite_chance
-				if roll < threshold_elite:
-					node["type"] = "elite"
-					node["roundId"] = sample_round_by_difficulty(prng, profile, progress, true)
+				assigned = true
+			
+			if not assigned:
+				# 战斗节点（含精英、宝箱、商店）
+				# battle 是兜底类型，无 max 限制；shop/elite/treasure 受 max 限制
+				var shop_rate = profile.get("shopRate", 0.12)
+				var elite_rate = profile.get("eliteRate", 0.15)
+				var distance_from_last_shop = index - last_shop_index
+				
+				if distance_from_last_shop < 3:
+					shop_rate = 0.0
+				
+				var roll = prng.next_float()
+				
+				# 非 battle 类型受 max 限制，已达上限则概率设为0
+				var effective_shop_rate = shop_rate if can_add.call("shop") else 0.0
+				var elite_chance = (elite_rate * (0.5 + progress * 0.5)) if can_add.call("elite") else 0.0
+				var treasure_chance = (0.10 * (0.5 + progress * 0.5)) if can_add.call("treasure") else 0.0
+				
+				var cum_prob = 0.0
+				var threshold_shop = cum_prob + effective_shop_rate
+				
+				if roll < threshold_shop:
+					node["type"] = "shop"
+					node["shopId"] = sample_shop_by_difficulty(prng, profile, progress)
+					node_counts["shop"] += 1
+					last_shop_index = index
 				else:
-					var threshold_treasure = threshold_elite + treasure_chance
-					if roll < threshold_treasure:
-						node["type"] = "treasure"
-						node["eventId"] = 80001  # 宝箱事件ID占位
+					var threshold_elite = threshold_shop + elite_chance
+					if roll < threshold_elite:
+						node["type"] = "elite"
+						node["roundId"] = sample_round_by_difficulty(prng, profile, progress, true)
+						node_counts["elite"] += 1
 					else:
-						node["type"] = "battle"
-						node["roundId"] = sample_round_by_difficulty(prng, profile, progress)
+						var threshold_treasure = threshold_elite + treasure_chance
+						if roll < threshold_treasure:
+							node["type"] = "treasure"
+							node["eventId"] = 80001  # 宝箱事件ID占位
+							node_counts["treasure"] += 1
+						else:
+							node["type"] = "battle"
+							node["roundId"] = sample_round_by_difficulty(prng, profile, progress)
+							node_counts["battle"] += 1
 		
 		# 抽样敌人池
 		if node.has("roundId"):
@@ -385,10 +415,57 @@ static func generate_map(difficulty: int, seed: int) -> MapModel:
 		
 		map.layers.append(node)
 	
+	# ===== 后处理：确保每种节点达到 min 限制 =====
+	for t in ["shop", "elite", "treasure", "event", "rest"]:
+		var limits = node_limits.get(t, {})
+		var min_val = limits.get("min", 0)
+		var current_count = node_counts.get(t, 0)
+		if current_count < min_val:
+			var needed = min_val - current_count
+			# 从 battle 节点中找可以转换的
+			var battle_indices = []
+			for i in range(map.layers.size()):
+				if map.layers[i].get("type") == "battle":
+					battle_indices.append(i)
+			
+			# 打乱顺序，随机选择
+			battle_indices = prng.shuffle(battle_indices)
+			for i in range(min(needed, battle_indices.size())):
+				var target_idx = battle_indices[i]
+				var node_ref = map.layers[target_idx]
+				match t:
+					"shop":
+						node_ref["type"] = "shop"
+						node_ref["shopId"] = sample_shop_by_difficulty(prng, profile, float(node_ref.get("level", 1)) / float(total_layers))
+						node_ref.erase("roundId")
+						node_ref.erase("enemies")
+					"elite":
+						node_ref["type"] = "elite"
+						var p = float(node_ref.get("level", 1)) / float(total_layers)
+						node_ref["roundId"] = sample_round_by_difficulty(prng, profile, p, true)
+					"treasure":
+						node_ref["type"] = "treasure"
+						node_ref["eventId"] = 80001
+						node_ref.erase("roundId")
+						node_ref.erase("enemies")
+					"event":
+						node_ref["type"] = "event"
+						node_ref["eventId"] = 70001
+						node_ref.erase("roundId")
+						node_ref.erase("enemies")
+					"rest":
+						node_ref["type"] = "rest"
+						node_ref["restId"] = 80001
+						node_ref.erase("roundId")
+						node_ref.erase("enemies")
+				node_counts[t] += 1
+	
 	# 后处理校验
 	if not MapModel.validate_map_model(map):
 		GDLogger.error("Map validation failed: generated map is invalid")
 	
+	print_map_debug_log(map)
+
 	return map
 
 static func print_map_debug_log(map: MapModel) -> void:
@@ -414,11 +491,23 @@ static func print_map_debug_log(map: MapModel) -> void:
 		if node.has("enemies"):
 			enemies = node["enemies"]
 		
+		# 输出额外字段
+		var extra = ""
+		var t = node.get("type", "")
+		match t:
+			"shop":
+				extra = " | shopId=" + str(node.get("shopId", 0))
+			"event":
+				extra = " | eventId=" + str(node.get("eventId", 0))
+			"rest":
+				extra = " | restId=" + str(node.get("restId", 0))
+			"treasure":
+				extra = " | eventId=" + str(node.get("eventId", 0))
+		
 		# 统计
-		var t = node.get("type", "battle")
 		if stats.has(t):
 			stats[t] += 1
 		
-		GDLogger.info("  " + str(idx + 1) + " | " + icon + " | round=" + str(round_id) + " | enemies=" + str(enemies))
+		GDLogger.info("  " + str(idx + 1) + " | " + icon + " | round=" + str(round_id) + " | enemies=" + str(enemies) + extra)
 	
 	GDLogger.info("=== Stats: " + str(stats))

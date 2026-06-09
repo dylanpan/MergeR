@@ -150,6 +150,7 @@ func get_difficulty_profile(difficulty: int) -> Dictionary:
 		"maxAtkMultiplier": base_curve.get("maxAtkMultiplier", 2.2) * cf,
 		"smoothingStart": base_curve.get("smoothingStart", 7),
 		"smoothingFactor": base_curve.get("smoothingFactor", 0.75),
+		"nodeLimits": profile.get("nodeLimits", {}),
 	}
 
 func get_difficulty_config(round_id: int) -> Dictionary:

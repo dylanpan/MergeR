@@ -610,6 +610,15 @@ const gameEvents: Dictionary = {
 			{"buffId": 90405, "chance": 0.15},
 		],
 	},
+	70004: {
+		"id": 70004, "name": "初始祝福", "type": "start_choice", "tier": 0,
+		"desc": "选择一项初始祝福",
+		"choices": [
+			{"buffId": 90001, "text": "攻击力+3", "icon": "atk"},
+			{"buffId": 90002, "text": "防御力+2", "icon": "def"},
+			{"buffId": 90102, "text": "立即获得2步", "icon": "step"},
+		],
+	},
 }
 
 # ---------- 休息系统配置 ----------
@@ -644,16 +653,26 @@ const gameStartLevel: Dictionary = {
 # 基于normal/hard/expert三条曲线线性插值平滑过渡
 # ==============================================
 const difficultyProfiles: Dictionary = {
-	1:  { "name": "休闲", "curve": "normal", "curveFactor": 0.70, "layerCount": 10, "shopRate": 0.30, "eliteRate": 0.10, "eventRate": 0.25, "restRate": 0.20, "bossFrequency": 8 },
-	2:  { "name": "简单", "curve": "normal", "curveFactor": 0.85, "layerCount": 12, "shopRate": 0.28, "eliteRate": 0.15, "eventRate": 0.23, "restRate": 0.18, "bossFrequency": 7 },
-	3:  { "name": "普通", "curve": "normal", "curveFactor": 1.00, "layerCount": 14, "shopRate": 0.26, "eliteRate": 0.20, "eventRate": 0.20, "restRate": 0.16, "bossFrequency": 6 },
-	4:  { "name": "进阶", "curve": "normal", "curveFactor": 1.15, "layerCount": 15, "shopRate": 0.24, "eliteRate": 0.25, "eventRate": 0.18, "restRate": 0.15, "bossFrequency": 6 },
-	5:  { "name": "困难", "curve": "hard",   "curveFactor": 0.85, "layerCount": 16, "shopRate": 0.22, "eliteRate": 0.30, "eventRate": 0.17, "restRate": 0.14, "bossFrequency": 5 },
-	6:  { "name": "挑战", "curve": "hard",   "curveFactor": 1.00, "layerCount": 17, "shopRate": 0.20, "eliteRate": 0.35, "eventRate": 0.16, "restRate": 0.13, "bossFrequency": 5 },
-	7:  { "name": "高手", "curve": "hard",   "curveFactor": 1.15, "layerCount": 18, "shopRate": 0.18, "eliteRate": 0.40, "eventRate": 0.15, "restRate": 0.12, "bossFrequency": 4 },
-	8:  { "name": "专家", "curve": "expert", "curveFactor": 0.85, "layerCount": 19, "shopRate": 0.16, "eliteRate": 0.45, "eventRate": 0.14, "restRate": 0.11, "bossFrequency": 4 },
-	9:  { "name": "大师", "curve": "expert", "curveFactor": 1.00, "layerCount": 20, "shopRate": 0.14, "eliteRate": 0.50, "eventRate": 0.13, "restRate": 0.10, "bossFrequency": 3 },
-	10: { "name": "地狱", "curve": "expert", "curveFactor": 1.20, "layerCount": 22, "shopRate": 0.12, "eliteRate": 0.60, "eventRate": 0.12, "restRate": 0.08, "bossFrequency": 3 },
+	1:  { "name": "休闲", "curve": "normal", "curveFactor": 0.70, "layerCount": 10, "shopRate": 0.30, "eliteRate": 0.10, "eventRate": 0.25, "restRate": 0.20, "bossFrequency": 8,
+		"nodeLimits": {"battle": {"min": 2, "max": 5}, "elite": {"min": 0, "max": 2}, "boss": {"min": 1, "max": 1}, "shop": {"min": 2, "max": 4}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 3}, "treasure": {"min": 1, "max": 2}} },
+	2:  { "name": "简单", "curve": "normal", "curveFactor": 0.85, "layerCount": 12, "shopRate": 0.28, "eliteRate": 0.15, "eventRate": 0.23, "restRate": 0.18, "bossFrequency": 7,
+		"nodeLimits": {"battle": {"min": 3, "max": 6}, "elite": {"min": 1, "max": 3}, "boss": {"min": 1, "max": 1}, "shop": {"min": 2, "max": 4}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 3}, "treasure": {"min": 1, "max": 2}} },
+	3:  { "name": "普通", "curve": "normal", "curveFactor": 1.00, "layerCount": 14, "shopRate": 0.26, "eliteRate": 0.20, "eventRate": 0.20, "restRate": 0.16, "bossFrequency": 6,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 1, "max": 3}, "boss": {"min": 1, "max": 1}, "shop": {"min": 2, "max": 4}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 2}, "treasure": {"min": 1, "max": 2}} },
+	4:  { "name": "进阶", "curve": "normal", "curveFactor": 1.15, "layerCount": 15, "shopRate": 0.24, "eliteRate": 0.25, "eventRate": 0.18, "restRate": 0.15, "bossFrequency": 6,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 2, "max": 4}, "boss": {"min": 1, "max": 1}, "shop": {"min": 2, "max": 4}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 2}, "treasure": {"min": 1, "max": 2}} },
+	5:  { "name": "困难", "curve": "hard",   "curveFactor": 0.85, "layerCount": 16, "shopRate": 0.22, "eliteRate": 0.30, "eventRate": 0.17, "restRate": 0.14, "bossFrequency": 5,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 2, "max": 5}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 3}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 2}, "treasure": {"min": 1, "max": 2}} },
+	6:  { "name": "挑战", "curve": "hard",   "curveFactor": 1.00, "layerCount": 17, "shopRate": 0.20, "eliteRate": 0.35, "eventRate": 0.16, "restRate": 0.13, "bossFrequency": 5,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 3, "max": 6}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 3}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 2}, "treasure": {"min": 1, "max": 2}} },
+	7:  { "name": "高手", "curve": "hard",   "curveFactor": 1.15, "layerCount": 18, "shopRate": 0.18, "eliteRate": 0.40, "eventRate": 0.15, "restRate": 0.12, "bossFrequency": 4,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 3, "max": 7}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 3}, "event": {"min": 1, "max": 3}, "rest": {"min": 1, "max": 2}, "treasure": {"min": 1, "max": 2}} },
+	8:  { "name": "专家", "curve": "expert", "curveFactor": 0.85, "layerCount": 19, "shopRate": 0.16, "eliteRate": 0.45, "eventRate": 0.14, "restRate": 0.11, "bossFrequency": 4,
+		"nodeLimits": {"battle": {"min": 4, "max": 8}, "elite": {"min": 4, "max": 8}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 2}, "event": {"min": 1, "max": 3}, "rest": {"min": 0, "max": 2}, "treasure": {"min": 0, "max": 2}} },
+	9:  { "name": "大师", "curve": "expert", "curveFactor": 1.00, "layerCount": 20, "shopRate": 0.14, "eliteRate": 0.50, "eventRate": 0.13, "restRate": 0.10, "bossFrequency": 3,
+		"nodeLimits": {"battle": {"min": 5, "max": 9}, "elite": {"min": 5, "max": 9}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 2}, "event": {"min": 1, "max": 2}, "rest": {"min": 0, "max": 2}, "treasure": {"min": 0, "max": 2}} },
+	10: { "name": "地狱", "curve": "expert", "curveFactor": 1.20, "layerCount": 22, "shopRate": 0.12, "eliteRate": 0.60, "eventRate": 0.12, "restRate": 0.08, "bossFrequency": 3,
+		"nodeLimits": {"battle": {"min": 6, "max": 10}, "elite": {"min": 6, "max": 12}, "boss": {"min": 1, "max": 1}, "shop": {"min": 1, "max": 2}, "event": {"min": 1, "max": 2}, "rest": {"min": 0, "max": 1}, "treasure": {"min": 0, "max": 2}} },
 }
 
 # ==============================================
