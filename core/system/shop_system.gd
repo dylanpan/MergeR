@@ -26,7 +26,11 @@ func open_shop(entity) -> void:
 		"shopType": shop_comp.shop_type,
 		"items": shop_comp.items.duplicate(),
 	}
-	GlobalEventBus.event_shop_open.emit(shop_comp.shop_id, shop_data)
+	GlobalEventBus.event_round_update.emit({
+		"type": "shop_open",
+		"shopId": shop_comp.shop_id,
+		"shopData": shop_data
+	})
 
 func buy_item(entity, item_index: int) -> bool:
 	var shop_comp = entity.get_component(ComponentNames.SHOP) as ShopComponent
@@ -36,7 +40,7 @@ func buy_item(entity, item_index: int) -> bool:
 		return false
 	var item = shop_comp.items[item_index]
 	shop_comp.remove_item(item_index)
-	GlobalEventBus.event_shop_buy.emit(item.get("id", 0), item_index)
+	GlobalEventBus.event_round_update.emit({"type": "shop_buy", "itemId": item.get("id", 0), "index": item_index})
 	return true
 
 func refresh_shop(entity) -> bool:
@@ -46,8 +50,8 @@ func refresh_shop(entity) -> bool:
 	if not shop_comp:
 		return false
 	shop_comp.refresh([])
-	GlobalEventBus.event_shop_refresh.emit(shop_comp.items, shop_comp.refresh_count)
+	GlobalEventBus.event_round_update.emit({"type": "shop_refresh", "items": shop_comp.items, "remaining_count": shop_comp.refresh_count})
 	return true
 
 func close_shop() -> void:
-	GlobalEventBus.event_shop_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "shop_close"})

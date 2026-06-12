@@ -6,7 +6,12 @@ func _init(p_skill_data: Dictionary = {}):
 	_register_event_listener()
 
 func _register_event_listener() -> void:
-	connect_to_bus("event_on_enemy_spawn")
+	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_battle_update(data: Dictionary) -> void:
+	if data.get("type", "") != "enemy_spawn":
+		return
+	execute({})
 
 func on_execute(context: Dictionary) -> void:
 	var count = skill_data.get("count", 1)
@@ -46,7 +51,7 @@ func on_execute(context: Dictionary) -> void:
 		# 注册实体到entity_manager
 		if _world and _world.entity_manager:
 			_world.entity_manager.register_entity(entity)
-		GlobalEventBus.event_on_enemy_spawn.emit(entity)
+		GlobalEventBus.event_battle_update.emit({"type": "enemy_spawn"})
 	
 	# UI召唤特效通知
 	GlobalEventBus.event_battle_update.emit({

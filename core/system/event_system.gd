@@ -45,7 +45,7 @@ func trigger_event(entity) -> void:
 	_cur_event_entity = entity
 	if _world:
 		_world.entity_manager.register_entity(entity)
-	GlobalEventBus.event_event_open.emit(entity.get_id(), event_data)
+	GlobalEventBus.event_round_update.emit({"type": "event_open", "eventId": entity.get_id(), "eventData": event_data})
 
 # 关闭当前事件
 func close_current_event() -> void:
@@ -68,4 +68,4 @@ func resolve_option(entity, option_id: int) -> void:
 	
 	if result:
 		_cur_event_entity = null
-	GlobalEventBus.event_event_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "event_close"})

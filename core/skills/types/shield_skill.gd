@@ -6,7 +6,7 @@ func _init(p_skill_data: Dictionary = {}):
 	_register_event_listener()
 
 func _register_event_listener() -> void:
-	connect_to_bus("event_ui_update_shield_absorb")
+	pass
 
 func on_execute(context: Dictionary) -> void:
 	var value = skill_data.get("value", 25)
@@ -21,9 +21,6 @@ func on_execute(context: Dictionary) -> void:
 	var shield_comp = target.get_component(ComponentNames.SHIELD) as ShieldComponent
 	if shield_comp:
 		shield_comp.add_shield(value, duration)
-	
-	# UI更新通知（向后兼容）
-	GlobalEventBus.event_ui_update_shield_absorb.emit(entity_id)
 	
 	# 护盾更新事件通知 → UI显示护盾值
 	GlobalEventBus.event_battle_update.emit({

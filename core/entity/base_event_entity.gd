@@ -39,7 +39,7 @@ func open() -> void:
 	"""打开事件，发送 UI 打开信号"""
 	_state = "opened"
 	on_open()
-	GlobalEventBus.event_event_open.emit(event_id, get_ui_data())
+	GlobalEventBus.event_round_update.emit({"type": "event_open", "eventId": event_id, "eventData": get_ui_data()})
 
 func select_option(option_id: int) -> bool:
 	"""处理选项选择，返回 true 表示事件完成"""
@@ -50,12 +50,12 @@ func select_option(option_id: int) -> bool:
 	on_option_select(option_id)
 	_state = "completed"
 	on_complete()
-	GlobalEventBus.event_event_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "event_close"})
 	return true
 
 func close() -> void:
 	"""强制关闭事件"""
-	GlobalEventBus.event_event_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "event_close"})
 	on_close()
 	dispose()
 

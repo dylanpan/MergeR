@@ -36,7 +36,7 @@ func open_rest(entity) -> void:
 		entity.open()
 	elif entity.has_method("on_enter"):
 		var rest_data = entity.on_enter()
-		GlobalEventBus.event_rest_open.emit(entity.get_id(), rest_data)
+		GlobalEventBus.event_round_update.emit({"type": "rest_open", "restId": entity.get_id(), "restData": rest_data})
 
 func confirm_rest(entity) -> void:
 	if not entity:
@@ -47,8 +47,8 @@ func confirm_rest(entity) -> void:
 		entity.confirm()
 	elif entity.has_method("on_confirm"):
 		entity.on_confirm()
-		GlobalEventBus.event_rest_confirm.emit()
-		GlobalEventBus.event_rest_close.emit()
+		GlobalEventBus.event_round_update.emit({"type": "rest_confirm"})
+		GlobalEventBus.event_round_update.emit({"type": "rest_close"})
 	
 	_current_rest = null
 
@@ -61,7 +61,7 @@ func skip_rest(entity) -> void:
 		entity.skip()
 	elif entity.has_method("on_skip"):
 		entity.on_skip()
-		GlobalEventBus.event_rest_skip.emit()
-		GlobalEventBus.event_rest_close.emit()
+		GlobalEventBus.event_round_update.emit({"type": "rest_skip"})
+		GlobalEventBus.event_round_update.emit({"type": "rest_close"})
 	
 	_current_rest = null

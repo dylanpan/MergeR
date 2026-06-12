@@ -26,7 +26,6 @@ func dispose() -> void:
 	queue_free()
 
 func _init_event() -> void:
-	GlobalEventBus.event_update_game_over.connect(_on_game_over)
 	GlobalEventBus.event_game_state.connect(_on_game_state)
 
 func _init_ui() -> void:

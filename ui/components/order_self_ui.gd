@@ -18,12 +18,15 @@ func dispose() -> void:
 	queue_free()
 
 func _init_event() -> void:
-	# 旧信号（向后兼容）
-	GlobalEventBus.event_ui_update_order_self.connect(_on_update_bullet)
-	GlobalEventBus.event_ui_update_self_atk.connect(_on_update_bullet)
-	GlobalEventBus.event_ui_update_self_hit.connect(_on_update_hp)
 	# 新通用信号
+	GlobalEventBus.event_ui_update.connect(_on_ui_update)
 	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_ui_update(data: Dictionary) -> void:
+	var type = data.get("type", "")
+	match type:
+		"order_self":
+			_on_update_bullet()
 
 func _on_battle_update(data: Dictionary) -> void:
 	var type = data.get("type", "")

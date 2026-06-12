@@ -30,7 +30,7 @@ func _update_display() -> void:
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		GlobalEventBus.event_ui_update_order_self.emit()
+		GlobalEventBus.event_ui_update.emit({"type": "order_self"})
 
 func set_drop_complete_handler(handler: Callable) -> void:
 	_drop_complete_handler = handler

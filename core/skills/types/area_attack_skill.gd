@@ -6,7 +6,12 @@ func _init(p_skill_data: Dictionary = {}):
 	_register_event_listener()
 
 func _register_event_listener() -> void:
-	connect_to_bus("event_ui_update_enermy_hit")
+	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_battle_update(data: Dictionary) -> void:
+	if data.get("type", "") != "enemy_hit":
+		return
+	execute(data)
 
 func on_execute(context: Dictionary) -> void:
 	var damage = skill_data.get("value", 10)

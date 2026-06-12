@@ -31,7 +31,7 @@ func _update_order_enermy_entities() -> void:
 				data["step"] = origin_meta.get("step", 30)
 				var bullets = origin_meta.get("bullets", [])
 				data["bullets"] = data.get("bullets", []) + bullets
-				GlobalEventBus.event_ui_update_enermy_reload.emit()
+				GlobalEventBus.event_battle_update.emit({"type": "reload"})
 			else:
 				# 发起攻击
 				data["isAtker"] = 1

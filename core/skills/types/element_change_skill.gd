@@ -6,7 +6,12 @@ func _init(p_skill_data: Dictionary = {}):
 	_register_event_listener()
 
 func _register_event_listener() -> void:
-	connect_to_bus("event_ui_update_self_atk")
+	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+func _on_battle_update(data: Dictionary) -> void:
+	if data.get("type", "") != "self_atk":
+		return
+	execute(data)
 
 func on_execute(context: Dictionary) -> void:
 	var element_type = context.get("elementType", skill_data.get("element", randi() % 4 + 1))

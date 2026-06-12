@@ -19,12 +19,8 @@ func on_opened(params = null) -> void:
 
 func on_closed() -> void:
 	# 断开事件连接
-	if GlobalEventBus.event_update_by_step.is_connected(_on_update_step):
-		GlobalEventBus.event_update_by_step.disconnect(_on_update_step)
-	if GlobalEventBus.event_update_game_over.is_connected(_on_game_over):
-		GlobalEventBus.event_update_game_over.disconnect(_on_game_over)
-	if GlobalEventBus.event_update_game_win.is_connected(_on_game_win):
-		GlobalEventBus.event_update_game_win.disconnect(_on_game_win)
+	if GlobalEventBus.event_round_update.is_connected(_on_update_step):
+		GlobalEventBus.event_round_update.disconnect(_on_update_step)
 	if GlobalEventBus.event_game_state.is_connected(_on_game_state_update):
 		GlobalEventBus.event_game_state.disconnect(_on_game_state_update)
 	
@@ -46,10 +42,7 @@ func _init_data(param: Dictionary = {}) -> void:
 			session.set_runtime_map(map)
 
 func _init_event() -> void:
-	GlobalEventBus.event_update_by_step.connect(_on_update_step)
-	# 旧信号（向后兼容）
-	GlobalEventBus.event_update_game_over.connect(_on_game_over)
-	GlobalEventBus.event_update_game_win.connect(_on_game_win)
+	GlobalEventBus.event_round_update.connect(_on_update_step)
 	# 新通用信号
 	GlobalEventBus.event_game_state.connect(_on_game_state_update)
 

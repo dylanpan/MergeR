@@ -38,7 +38,7 @@ func open() -> void:
 	"""打开休息点，发送 UI 打开信号"""
 	_state = "opened"
 	on_open()
-	GlobalEventBus.event_rest_open.emit(rest_id, get_ui_data())
+	GlobalEventBus.event_round_update.emit({"type": "rest_open", "restId": rest_id, "restData": get_ui_data()})
 
 func confirm() -> bool:
 	"""确认使用休息功能"""
@@ -48,19 +48,19 @@ func confirm() -> bool:
 	on_confirm()
 	_state = "completed"
 	on_complete()
-	GlobalEventBus.event_rest_confirm.emit()
-	GlobalEventBus.event_rest_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "rest_confirm"})
+	GlobalEventBus.event_round_update.emit({"type": "rest_close"})
 	return true
 
 func skip() -> void:
 	"""跳过休息点"""
 	on_skip()
-	GlobalEventBus.event_rest_skip.emit()
-	GlobalEventBus.event_rest_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "rest_skip"})
+	GlobalEventBus.event_round_update.emit({"type": "rest_close"})
 
 func close() -> void:
 	"""强制关闭"""
-	GlobalEventBus.event_rest_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "rest_close"})
 	on_close()
 	dispose()
 

@@ -58,7 +58,11 @@ func _start_phase_transition(phase_index: int) -> void:
 
 func _apply_phase_effects(phase: Dictionary) -> void:
 	var skills = phase.get("skills", [])
-	GlobalEventBus.event_on_boss_phase_change.emit(entity_id, phase.get("id", ""))
+	GlobalEventBus.event_battle_update.emit({
+		"type": "phase_change",
+		"entity_id": entity_id,
+		"phase_id": phase.get("id", "")
+	})
 
 func get_current_phase_id() -> String:
 	return current_phase.get("id", "")

@@ -40,8 +40,8 @@ func _update_after_battle() -> int:
 	# 步数限制检测
 	var step_progress = _world.game_state_service.get_step_progress()
 	if step_progress.get("max", 0) > 0 and step_progress.get("current", 0) >= step_progress.get("max", 0):
-		GlobalEventBus.event_ui_update_refresh_warning.emit({
-			"type": "step_limit",
+		GlobalEventBus.event_ui_update.emit({
+			"type": "refresh_warning",
 			"message": "步数已达上限，即将刷新订单！"
 		})
 		return GameConsts.RoundState_MaxStep
@@ -111,7 +111,7 @@ func _game_start() -> void:
 	_add_shot_entities()
 	
 	_world.game_state_service.set_init_flag(true)
-	GlobalEventBus.event_ui_update_step.emit(_world.game_state_service.get_step_progress())
+	GlobalEventBus.event_ui_update.emit({"type": "step_update", "progress": _world.game_state_service.get_step_progress()})
 
 func _add_element_entities(game_data) -> void:
 	if not _world:
@@ -192,7 +192,7 @@ func _add_new_order_enermy_entities() -> void:
 			var entity = OrderEnermyEntity.new(data)
 			_world.entity_manager.register_entity(entity)
 	_world.game_state_service.reset_round_total_step()
-	GlobalEventBus.event_ui_update_step.emit(_world.game_state_service.get_step_progress())
+	GlobalEventBus.event_ui_update.emit({"type": "step_update", "progress": _world.game_state_service.get_step_progress()})
 
 func _game_over() -> void:
 	if not _world:
@@ -227,21 +227,25 @@ func _game_round_over() -> void:
 	var shops = level_meta.get("shops", [])
 	if not shops.is_empty():
 		for shop_id in shops:
-			GlobalEventBus.event_shop_open.emit(shop_id, _world.config_service.get_game_shop(shop_id))
+			GlobalEventBus.event_round_update.emit({
+				"type": "shop_open",
+				"shopId": shop_id,
+				"shopData": _world.config_service.get_game_shop(shop_id)
+			})
 		return
 	
 	# 检查事件配置
 	var events = level_meta.get("events", [])
 	if not events.is_empty():
 		for event_id in events:
-			GlobalEventBus.event_event_open.emit(event_id, _world.config_service.get_game_event(event_id))
+			GlobalEventBus.event_round_update.emit({"type": "event_open", "eventId": event_id, "eventData": _world.config_service.get_game_event(event_id)})
 		return
 	
 	# 检查休息节点配置
 	var rests = level_meta.get("rests", [])
 	if not rests.is_empty():
 		for rest_id in rests:
-			GlobalEventBus.event_rest_open.emit(rest_id, _world.config_service.get_game_rest(rest_id))
+			GlobalEventBus.event_round_update.emit({"type": "rest_open", "restId": rest_id, "restData": _world.config_service.get_game_rest(rest_id)})
 		return
 	
 	# 无特殊节点，继续下一关

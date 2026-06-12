@@ -14,23 +14,34 @@ func dispose() -> void:
 	queue_free()
 
 func _init_event() -> void:
-	# 旧信号（向后兼容）
-	GlobalEventBus.event_ui_update_enermy_atk.connect(_on_update_bullet)
-	GlobalEventBus.event_ui_update_enermy_hit.connect(_on_update_hp)
-	GlobalEventBus.event_update_by_step.connect(_on_update_step)
-	GlobalEventBus.event_ui_update_enermy_reload.connect(_on_update_bullet)
-	GlobalEventBus.event_ui_update_step.connect(_on_update_step_display)
-	GlobalEventBus.event_ui_update_refresh_warning.connect(_on_show_refresh_warning)
 	# 新通用信号
+	GlobalEventBus.event_ui_update.connect(_on_ui_update)
 	GlobalEventBus.event_battle_update.connect(_on_battle_update)
+
+	# 新通用信号
+	GlobalEventBus.event_round_update.connect(_on_round_update)
+
+func _on_round_update(data: Dictionary) -> void:
+	if data.get("type", "") == "step":
+		_on_update_step()
+
+func _on_ui_update(data: Dictionary) -> void:
+	var type = data.get("type", "")
+	match type:
+		"refresh_warning":
+			_on_show_refresh_warning(data)
+		"step_update":
+			_on_update_step_display(data.get("progress", {}))
 
 func _on_battle_update(data: Dictionary) -> void:
 	var type = data.get("type", "")
 	match type:
 		"damage":
 			_on_update_hp()
-		"reload", "enemy_hit", "enemy_atk":
+		"reload", "enemy_atk":
 			_on_update_bullet()
+		"enemy_hit":
+			_on_update_hp()
 		"self_hit", "self_atk":
 			pass  # 对方的动作不会影响本方的显示
 

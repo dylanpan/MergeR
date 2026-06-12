@@ -13,9 +13,11 @@ func init() -> void:
 	_bind_events()
 
 func _bind_events() -> void:
-	GlobalEventBus.event_shop_open.connect(_on_shop_open)
+	GlobalEventBus.event_round_update.connect(_on_shop_open)
 
 func _on_shop_open(args: Dictionary) -> void:
+	if args.get("type", "") != "shop_open":
+		return
 	var shop_id = args.get("shopId", 0)
 	var shop_data = args.get("shopData", {})
 	
@@ -76,7 +78,7 @@ func _on_item_buy(index: int) -> void:
 	if success:
 		_update_item_slots()
 		_update_gold_display()
-		GlobalEventBus.event_shop_buy.emit(0, index)
+		GlobalEventBus.event_round_update.emit({"type": "shop_buy", "itemId": 0, "index": index})
 	else:
 		if has_node("lblFeedback"):
 			get_node("lblFeedback").text = "金币不足或商品已售罄！"
@@ -97,7 +99,7 @@ func _on_refresh_click() -> void:
 	var success = shop_system.refresh_shop(_current_shop_entity)
 	if success:
 		_update_item_slots()
-		GlobalEventBus.event_shop_refresh.emit([], 0)
+		GlobalEventBus.event_round_update.emit({"type": "shop_refresh"})
 
 func _on_close_click() -> void:
 	_hide_shop_ui()
@@ -106,7 +108,7 @@ func _hide_shop_ui() -> void:
 	visible = false
 	_is_shop_open = false
 	_current_shop_entity = null
-	GlobalEventBus.event_shop_close.emit()
+	GlobalEventBus.event_round_update.emit({"type": "shop_close"})
 
 func dispose() -> void:
 	_current_shop_entity = null

@@ -85,8 +85,8 @@ func _on_drag_complete(from_entity_ui, to_entity) -> void:
 	if _on_drop_complete_handler.is_valid():
 		var is_update_by_step = _on_drop_complete_handler.call(from_entity, to_entity)
 		if is_update_by_step:
-			GlobalEventBus.event_ui_update_order_self.emit()
-			GlobalEventBus.event_update_by_step.emit()
+			GlobalEventBus.event_ui_update.emit({"type": "order_self"})
+			GlobalEventBus.event_round_update.emit({"type": "step"})
 	
 	from_entity_ui.update_ui_icon()
 	if self_ui_comp:
@@ -119,7 +119,7 @@ func _on_click_element(event: InputEvent = null) -> void:
 		if area_id == GameConsts.AreaId_Shot:
 			if _on_click_handler.is_valid():
 				_on_click_handler.call()
-			GlobalEventBus.event_update_by_step.emit()
+			GlobalEventBus.event_round_update.emit({"type": "step"})
 
 func set_drop_complete_handler(handler: Callable) -> void:
 	_on_drop_complete_handler = handler
